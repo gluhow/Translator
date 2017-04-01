@@ -2,17 +2,31 @@ package ru.greenfil.translator;
 
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by greenfil on 01.04.17.
+ * Объект-переводчик, опирающийся на API Yandex
  */
 
 public class YaTranslator implements ITranslator {
-    TextView textOut;
-    ILanguage sourceLang;
-    ILanguage targetLang;
-    String transText;
+    protected TextView textOut;
+    protected ILanguage sourceLang;
+    protected ILanguage targetLang;
+    protected ArrayList<ILanguage> langList;
+    protected String transText;
+
+    public YaTranslator() {
+        langList=new ArrayList<ILanguage>();
+        TLanguage curLang;
+
+        langList.add(new TLanguage("русский", "ru"));
+        langList.add(new TLanguage("английский", "en"));
+
+        sourceLang=langList.get(0);
+        targetLang=langList.get(1);
+    }
+
 
     @Override
     public void SetSourceLang(ILanguage _Lang) {
@@ -36,7 +50,9 @@ public class YaTranslator implements ITranslator {
 
     @Override
     public void SwapLang() {
-
+        final ILanguage temp=GetSourceLang();
+        SetSourceLang(GetTargetLang());
+        SetTargetLang(temp);
     }
 
     @Override
@@ -51,12 +67,12 @@ public class YaTranslator implements ITranslator {
 
     @Override
     public List<ILanguage> GetSourceLanguageList() {
-        return null;
+        return langList;
     }
 
     @Override
     public List<ILanguage> GetTargetLanguageList() {
-        return null;
+        return langList;
     }
 
 
