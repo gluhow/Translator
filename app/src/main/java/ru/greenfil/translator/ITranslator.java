@@ -20,6 +20,7 @@ public interface ITranslator {
     //Поменять на что-то более вменяемое
     void SetTextOut(TextView _TextOut);
 
-    List<ILanguage> GetLanguageList();
+    List<ILanguage> GetSourceLanguageList();
+    List<ILanguage> GetTargetLanguageList();
     //Позже можно подумать о подгрузке списка языков
 }
