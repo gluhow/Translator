@@ -5,8 +5,8 @@ package ru.greenfil.translator;
  */
 
 public class TLanguage implements ILanguage {
-    String caption;
-    String ui;
+    protected String caption;
+    protected String ui;
 
     public TLanguage(String caption, String ui) {
         this.caption = caption;
