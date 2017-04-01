@@ -1,10 +1,10 @@
 package ru.greenfil.translator;
 
 /**
- * Created by greenfil on 01.04.17.
+ * Интерфейс класса "Язык"
  */
 
 interface ILanguage {
-    public String GetCaption();
-    public String GetUI();
+    String GetCaption();
+    String GetUI();
 }
