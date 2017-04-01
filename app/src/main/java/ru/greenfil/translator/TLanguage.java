@@ -7,6 +7,12 @@ package ru.greenfil.translator;
 public class TLanguage implements ILanguage {
     String caption;
     String ui;
+
+    public TLanguage(String caption, String ui) {
+        this.caption = caption;
+        this.ui = ui;
+    }
+
     @Override
     public String GetCaption() {
         return caption;
@@ -23,5 +29,10 @@ public class TLanguage implements ILanguage {
 
     public void SetUI(String Avalue) {
         ui=Avalue;
+    }
+
+    @Override
+    public String toString() {
+        return GetCaption();
     }
 }
