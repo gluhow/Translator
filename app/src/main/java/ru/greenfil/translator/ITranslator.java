@@ -1,6 +1,7 @@
 package ru.greenfil.translator;
 import android.widget.TextView;
 
+import java.io.IOException;
 import java.util.List;
 
 import ru.greenfil.translator.ILanguage;
@@ -10,17 +11,6 @@ import ru.greenfil.translator.ILanguage;
 
 
 public interface ITranslator {
-    void SetSourceLang(ILanguage _Lang);
-    ILanguage GetSourceLang();
-    void SetTargetLang(ILanguage _Lang);
-    ILanguage GetTargetLang();
-    void SwapLang();
-    void SetText(String _Text);
-
-    //Поменять на что-то более вменяемое
-    void SetTextOut(TextView _TextOut);
-
-    List<ILanguage> GetSourceLanguageList();
-    List<ILanguage> GetTargetLanguageList();
-    //Позже можно подумать о подгрузке списка языков
+    String Translate(String MyText, ILanguage SourceLanguage, ILanguage TargetLanguage) throws IOException;
+//Позже можно подумать о подгрузке списка языков
 }
