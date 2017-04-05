@@ -2,6 +2,9 @@ package ru.greenfil.translator;
 
 import android.widget.TextView;
 
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,70 +13,21 @@ import java.util.List;
  */
 
 public class YaTranslator implements ITranslator {
-    protected TextView textOut;
-    protected ILanguage sourceLang;
-    protected ILanguage targetLang;
-    protected ArrayList<ILanguage> langList;
-    protected String transText;
-
-    public YaTranslator() {
-        langList=new ArrayList<ILanguage>();
-        TLanguage curLang;
-
-        langList.add(new TLanguage("русский", "ru"));
-        langList.add(new TLanguage("английский", "en"));
-
-        sourceLang=langList.get(0);
-        targetLang=langList.get(1);
-    }
-
-
     @Override
-    public void SetSourceLang(ILanguage _Lang) {
-        sourceLang=_Lang;
+    public String Translate(String MyText, ILanguage SourceLanguage, ILanguage TargetLanguage) throws IOException {
+        HttpURLConnection connection;
+        URL url=new URL("https://translate.yandex.net/api/v1.5/tr.json/translate ?");
+        connection = (HttpURLConnection) url.openConnection();
+        int response = connection.getResponseCode();
+        if (response==HttpURLConnection.HTTP_OK)
+        {
+            return "Ok";
+        }
+        else
+        {
+            return "not Ok";
+        }
+
+
     }
-
-    @Override
-    public ILanguage GetSourceLang() {
-        return sourceLang;
-    }
-
-    @Override
-    public void SetTargetLang(ILanguage _Lang) {
-        targetLang=_Lang;
-    }
-
-    @Override
-    public ILanguage GetTargetLang() {
-        return targetLang;
-    }
-
-    @Override
-    public void SwapLang() {
-        final ILanguage temp=GetSourceLang();
-        SetSourceLang(GetTargetLang());
-        SetTargetLang(temp);
-    }
-
-    @Override
-    public void SetText(String _Text) {
-        transText=_Text;
-    }
-
-    @Override
-    public void SetTextOut(TextView _TextOut) {
-        textOut=_TextOut;
-    }
-
-    @Override
-    public List<ILanguage> GetSourceLanguageList() {
-        return langList;
-    }
-
-    @Override
-    public List<ILanguage> GetTargetLanguageList() {
-        return langList;
-    }
-
-
 }
