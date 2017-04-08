@@ -1,16 +1,11 @@
 package ru.greenfil.translator;
-import android.widget.TextView;
 
-import java.io.IOException;
-import java.util.List;
-
-import ru.greenfil.translator.ILanguage;
 /**
- * Created by greenfil on 01.04.17.
+ * Описание класса "Переводчик" без привязки к сервису
  */
 
 
-public interface ITranslator {
+interface ITranslator {
     String Translate(String MyText, ILanguage SourceLanguage, ILanguage TargetLanguage);
 //Позже можно подумать о подгрузке списка языков
 }
