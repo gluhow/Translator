@@ -1,5 +1,7 @@
 package ru.greenfil.translator;
 
+import android.icu.text.SelectFormat;
+import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -32,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
         textOut=(TextView)findViewById(R.id.outputText);
         textOut.setText("");
         textIn=(MultiAutoCompleteTextView)findViewById(R.id.InputText);
-        textIn.setText("");
+        textIn.setText("Hello World!!!");
         languageList=new ArrayList<ILanguage>();
         languageList.add(new TLanguage("English","en"));
         languageList.add(new TLanguage("Русский","ru"));
@@ -53,15 +55,38 @@ public class MainActivity extends AppCompatActivity {
         translateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                try {
-                    textOut.setText(mytranslator.Translate(textIn.getText().toString(),
-                            languageList.get(0), languageList.get(1)));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                GetTranslate getTranslate=new GetTranslate();
+                getTranslate.execute(mytranslator);
+            /*
+            textOut.setText(mytranslator.Translate());*/
             }
         });
         FormUpdate();
+    }
+
+    private class GetTranslate
+        extends AsyncTask<ITranslator, Void, String>{
+
+        private ILanguage sourceLang;
+        private ILanguage targetLang;
+        private String text;
+
+        @Override
+        protected void onPreExecute() {
+            sourceLang=languageList.get(0);
+            targetLang=languageList.get(1);
+            text=textIn.getText().toString();
+        }
+
+        @Override
+        protected String doInBackground(ITranslator... params) {
+            return params[0].Translate(text, sourceLang, targetLang);
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            textOut.setText(s);
+        }
     }
 
     protected void FormUpdate(){
