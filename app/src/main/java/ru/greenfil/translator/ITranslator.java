@@ -11,6 +11,6 @@ import ru.greenfil.translator.ILanguage;
 
 
 public interface ITranslator {
-    String Translate(String MyText, ILanguage SourceLanguage, ILanguage TargetLanguage) throws IOException;
+    String Translate(String MyText, ILanguage SourceLanguage, ILanguage TargetLanguage);
 //Позже можно подумать о подгрузке списка языков
 }
