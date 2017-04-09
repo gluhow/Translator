@@ -1,5 +1,9 @@
 package ru.greenfil.translator;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.net.URL;
@@ -12,7 +16,7 @@ import javax.net.ssl.HttpsURLConnection;
  */
 
 class YaTranslator implements ITranslator {
-    protected String GetJSONAnswer(String text, String sourceLang, String targetLang) {
+    private String GetWebAnswer(String text, String sourceLang, String targetLang) {
         String yaURL="https://translate.yandex.net/api/v1.5/tr.json/translate ?";
         String params="";
         try {
@@ -27,13 +31,11 @@ class YaTranslator implements ITranslator {
         }
 
         //InputStream is = null;
-
-        HttpsURLConnection connection = null;
         String res="";
 
         try {
             URL url=new URL(yaURL);
-            connection = (HttpsURLConnection) url.openConnection();
+            HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
             connection.setRequestMethod("POST");
             connection.setDoOutput(true);
             connection.setDoInput(true);
@@ -54,24 +56,31 @@ class YaTranslator implements ITranslator {
                 }
                 byte[] data = baos.toByteArray();
                 res = new String(data, "UTF-8");
-
             }
-            else
-            {
-                res="";
-            }
+            connection.disconnect();
         }
         catch (Exception e) {
             res="";
         }
-        finally {
-            connection.disconnect();
-        }
+        /*finally {
+
+        }*/
         return res;
+    }
+    private String GetTextFROMJSON(String text){
+        try {
+            JSONObject resJSON = new JSONObject(text);
+            JSONArray textAr = resJSON.getJSONArray("text");
+            return (String) textAr.get(0);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return text;
     }
 
     @Override
     public String Translate(String MyText, ILanguage SourceLanguage, ILanguage TargetLanguage) {
-        return GetJSONAnswer(MyText, SourceLanguage.GetUI(), TargetLanguage.GetUI());
+        String WebAns = GetWebAnswer(MyText, SourceLanguage.GetUI(), TargetLanguage.GetUI());
+        return GetTextFROMJSON(WebAns);
     }
 }
