@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -25,6 +26,8 @@ public class MainActivity extends AppCompatActivity {
     Spinner TargetSpinner;
     ArrayList<ILanguage> languageList;
     GetTranslate getTranslate=null;
+    Button buttonSwap;
+    //OnLangChange LangChange;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,18 +42,22 @@ public class MainActivity extends AppCompatActivity {
         languageList=new ArrayList<ILanguage>();
         languageList.add(new TLanguage("English","en"));
         languageList.add(new TLanguage("Русский","ru"));
+        buttonSwap=(Button)findViewById(R.id.buttonSwap);
 
         mytranslator = new YaTranslator();
         langAdapter = new ArrayAdapter<ILanguage>(this, android.R.layout.simple_spinner_item,
                 languageList);
         langAdapter.setDropDownViewResource(android.R.layout.simple_spinner_item);
 
+        OnLangChange langChange = new OnLangChange();
         SourceSpinner=(Spinner)findViewById(R.id.SourceSpinner);
         SourceSpinner.setAdapter(langAdapter);
+        SourceSpinner.setOnItemSelectedListener(langChange);
 
         TargetSpinner=(Spinner)findViewById(R.id.TargetSpinner);
         TargetSpinner.setAdapter(langAdapter);
         TargetSpinner.setSelection(1);
+        TargetSpinner.setOnItemSelectedListener(langChange);
     }
 
     private class sourceTextChange implements TextWatcher{
@@ -61,17 +68,21 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {
-            if (getTranslate!=null) {
-                getTranslate.cancel(true);
-            };
-            getTranslate=new GetTranslate();
-            getTranslate.execute(mytranslator);
+            translateNow();
         }
 
         @Override
         public void afterTextChanged(Editable s) {
 
         }
+    }
+    private void translateNow(){
+        //Надо подумать о снижении траффика во время ввода текста мобыть задержка?
+        if (getTranslate!=null) {
+            getTranslate.cancel(true);
+        };
+        getTranslate=new GetTranslate();
+        getTranslate.execute(mytranslator);
     }
 
     private class GetTranslate
@@ -103,5 +114,18 @@ public class MainActivity extends AppCompatActivity {
         int tempLang=SourceSpinner.getSelectedItemPosition();
         SourceSpinner.setSelection(TargetSpinner.getSelectedItemPosition());
         TargetSpinner.setSelection(tempLang);
+    }
+
+    private class OnLangChange implements AdapterView.OnItemSelectedListener {
+
+        @Override
+        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+            translateNow();
+        }
+
+        @Override
+        public void onNothingSelected(AdapterView<?> parent) {
+
+        }
     }
 }
