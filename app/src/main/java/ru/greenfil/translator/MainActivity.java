@@ -1,6 +1,5 @@
 package ru.greenfil.translator;
 
-import android.icu.text.SelectFormat;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -11,9 +10,7 @@ import android.widget.MultiAutoCompleteTextView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -21,9 +18,8 @@ public class MainActivity extends AppCompatActivity {
     ITranslator mytranslator;
     MultiAutoCompleteTextView textIn;
     Spinner SourceSpinner;
-    ArrayAdapter<ILanguage> sourceAdapter;
+    ArrayAdapter<ILanguage> langAdapter;
     Spinner TargetSpinner;
-    ArrayAdapter<ILanguage> targetAdapter;
     ArrayList<ILanguage> languageList;
     Button translateButton;
 
@@ -35,21 +31,22 @@ public class MainActivity extends AppCompatActivity {
         textOut.setText("");
         textIn=(MultiAutoCompleteTextView)findViewById(R.id.InputText);
         textIn.setText("Hello World!!!");
+
         languageList=new ArrayList<ILanguage>();
         languageList.add(new TLanguage("English","en"));
         languageList.add(new TLanguage("Русский","ru"));
+
         mytranslator = new YaTranslator();
-        SourceSpinner=(Spinner)findViewById(R.id.SourceSpinner);
-        sourceAdapter = new ArrayAdapter<ILanguage>(this, android.R.layout.simple_spinner_item,
+        langAdapter = new ArrayAdapter<ILanguage>(this, android.R.layout.simple_spinner_item,
                 languageList);
-        sourceAdapter.setDropDownViewResource(android.R.layout.simple_spinner_item);
-        SourceSpinner.setAdapter(sourceAdapter);
+        langAdapter.setDropDownViewResource(android.R.layout.simple_spinner_item);
+
+        SourceSpinner=(Spinner)findViewById(R.id.SourceSpinner);
+        SourceSpinner.setAdapter(langAdapter);
 
         TargetSpinner=(Spinner)findViewById(R.id.TargetSpinner);
-        targetAdapter = new ArrayAdapter<ILanguage>(this, android.R.layout.simple_spinner_item,
-                languageList);
-        targetAdapter.setDropDownViewResource(android.R.layout.simple_spinner_item);
-        TargetSpinner.setAdapter(targetAdapter);
+        TargetSpinner.setAdapter(langAdapter);
+        TargetSpinner.setSelection(1);
 
         translateButton=(Button)findViewById(R.id.translateButton);
         translateButton.setOnClickListener(new View.OnClickListener() {
@@ -73,8 +70,8 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected void onPreExecute() {
-            sourceLang=languageList.get(0);
-            targetLang=languageList.get(1);
+            sourceLang= (ILanguage) SourceSpinner.getSelectedItem();
+            targetLang= (ILanguage) TargetSpinner.getSelectedItem();
             text=textIn.getText().toString();
         }
 
@@ -90,11 +87,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     protected void FormUpdate(){
-        /*SourceSpinner.setSelection(sourceAdapter.getPosition(curTranslator.GetSourceLang()));
+        /*SourceSpinner.setSelection(langAdapter.getPosition(curTranslator.GetSourceLang()));
         TargetSpinner.setSelection(targetAdapter.getPosition(curTranslator.GetTargetLang()));*/
     }
 
     public void OnSwapLanguage(View view) {
-        FormUpdate();
+        int tempLang=SourceSpinner.getSelectedItemPosition();
+        SourceSpinner.setSelection(TargetSpinner.getSelectedItemPosition());
+        TargetSpinner.setSelection(tempLang);
     }
 }
