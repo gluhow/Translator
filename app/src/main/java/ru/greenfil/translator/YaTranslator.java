@@ -30,7 +30,6 @@ class YaTranslator implements ITranslator {
             e.printStackTrace();
         }
 
-        //InputStream is = null;
         String res="";
 
         try {
@@ -62,15 +61,19 @@ class YaTranslator implements ITranslator {
         catch (Exception e) {
             res="";
         }
-        /*finally {
 
-        }*/
         return res;
     }
     private String GetTextFROMJSON(String text){
+        //return text;
+
         try {
             JSONObject resJSON = new JSONObject(text);
             JSONArray textAr = resJSON.getJSONArray("text");
+            /*if (resJSON.getInt("code")!=200)
+            {
+                return Integer.toString(resJSON.getInt("code"));
+            }*/
             return (String) textAr.get(0);
         } catch (JSONException e) {
             e.printStackTrace();
