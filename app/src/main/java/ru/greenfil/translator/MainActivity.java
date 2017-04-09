@@ -3,9 +3,12 @@ package ru.greenfil.translator;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.MultiAutoCompleteTextView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -16,12 +19,12 @@ public class MainActivity extends AppCompatActivity {
 
     TextView textOut;
     ITranslator mytranslator;
-    MultiAutoCompleteTextView textIn;
+    EditText textIn;
     Spinner SourceSpinner;
     ArrayAdapter<ILanguage> langAdapter;
     Spinner TargetSpinner;
     ArrayList<ILanguage> languageList;
-    Button translateButton;
+    GetTranslate getTranslate=null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,8 +32,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         textOut=(TextView)findViewById(R.id.outputText);
         textOut.setText("");
-        textIn=(MultiAutoCompleteTextView)findViewById(R.id.InputText);
+        textIn=(EditText)findViewById(R.id.InputText);
         textIn.setText("Hello World!!!");
+        textIn.addTextChangedListener(new sourceTextChange());
 
         languageList=new ArrayList<ILanguage>();
         languageList.add(new TLanguage("English","en"));
@@ -47,18 +51,27 @@ public class MainActivity extends AppCompatActivity {
         TargetSpinner=(Spinner)findViewById(R.id.TargetSpinner);
         TargetSpinner.setAdapter(langAdapter);
         TargetSpinner.setSelection(1);
+    }
 
-        translateButton=(Button)findViewById(R.id.translateButton);
-        translateButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                GetTranslate getTranslate=new GetTranslate();
-                getTranslate.execute(mytranslator);
-            /*
-            textOut.setText(mytranslator.Translate());*/
-            }
-        });
-        FormUpdate();
+    private class sourceTextChange implements TextWatcher{
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+            if (getTranslate!=null) {
+                getTranslate.cancel(true);
+            };
+            getTranslate=new GetTranslate();
+            getTranslate.execute(mytranslator);
+        }
+
+        @Override
+        public void afterTextChanged(Editable s) {
+
+        }
     }
 
     private class GetTranslate
@@ -84,11 +97,6 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(String s) {
             textOut.setText(s);
         }
-    }
-
-    protected void FormUpdate(){
-        /*SourceSpinner.setSelection(langAdapter.getPosition(curTranslator.GetSourceLang()));
-        TargetSpinner.setSelection(targetAdapter.getPosition(curTranslator.GetTargetLang()));*/
     }
 
     public void OnSwapLanguage(View view) {
