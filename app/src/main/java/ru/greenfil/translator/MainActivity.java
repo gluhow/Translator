@@ -1,11 +1,13 @@
 package ru.greenfil.translator;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -83,6 +85,12 @@ public class MainActivity extends AppCompatActivity {
         else favoritesButton.setImageResource(R.drawable.nonfavorite);
     }
 
+/*    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }*/
+
     public void addFavorites(View view) {
         TOneWord CurrentWord=GetCurrentWord();
         if (favoritList.contains(CurrentWord)) {
@@ -94,6 +102,11 @@ public class MainActivity extends AppCompatActivity {
             favoritList.add(CurrentWord);
             favoritesButton.setImageResource(R.drawable.favorite);
         }
+    }
+
+    public void historyClick(MenuItem item) {
+        Intent history=new Intent(MainActivity.this, History.class);
+        startActivity(history);
     }
 
     private class sourceTextChange implements TextWatcher{
