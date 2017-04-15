@@ -117,12 +117,17 @@ public class MainActivity extends AppCompatActivity {
         protected String doInBackground(ITranslator... params) {
             if (CurrentWord.getTargetText().equals(""))
             {
+                try {
+                    Thread.sleep(1000); //Задержка перед переводом для сохранения траффика
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
                 return params[0].Translate(
                         CurrentWord.getSourceText(),
                         CurrentWord.getSourceLang(),
                         CurrentWord.getTargetLang());
             }
-            else return CurrentWord.getTargetText();
+            else return "Histrory!" + CurrentWord.getTargetText();
         }
 
         @Override
