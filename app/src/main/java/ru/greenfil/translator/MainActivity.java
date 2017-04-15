@@ -10,7 +10,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.MultiAutoCompleteTextView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -27,6 +26,8 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<ILanguage> languageList;
     GetTranslate getTranslate=null;
     Button buttonSwap;
+    ArrayList<TOneWord> historyList;
+    ArrayList<TOneWord> favoritList;
     //OnLangChange LangChange;
 
     @Override
@@ -39,13 +40,13 @@ public class MainActivity extends AppCompatActivity {
         textIn.setText("Hello World!!!");
         textIn.addTextChangedListener(new sourceTextChange());
 
-        languageList=new ArrayList<ILanguage>();
+        languageList=new ArrayList<>();
         languageList.add(new TLanguage("English","en"));
         languageList.add(new TLanguage("Русский","ru"));
         buttonSwap=(Button)findViewById(R.id.buttonSwap);
 
         mytranslator = new YaTranslator();
-        langAdapter = new ArrayAdapter<ILanguage>(this, android.R.layout.simple_spinner_item,
+        langAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item,
                 languageList);
         langAdapter.setDropDownViewResource(android.R.layout.simple_spinner_item);
 
@@ -58,6 +59,9 @@ public class MainActivity extends AppCompatActivity {
         TargetSpinner.setAdapter(langAdapter);
         TargetSpinner.setSelection(1);
         TargetSpinner.setOnItemSelectedListener(langChange);
+
+        historyList=new ArrayList<>();
+        favoritList=new ArrayList<>();
     }
 
     private class sourceTextChange implements TextWatcher{
@@ -80,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
         //Надо подумать о снижении траффика во время ввода текста мобыть задержка?
         if (getTranslate!=null) {
             getTranslate.cancel(true);
-        };
+        }
         getTranslate=new GetTranslate();
         getTranslate.execute(mytranslator);
     }
@@ -88,25 +92,47 @@ public class MainActivity extends AppCompatActivity {
     private class GetTranslate
         extends AsyncTask<ITranslator, Void, String>{
 
-        private ILanguage sourceLang;
-        private ILanguage targetLang;
-        private String text;
+        TOneWord CurrentWord;
+
 
         @Override
         protected void onPreExecute() {
-            sourceLang= (ILanguage) SourceSpinner.getSelectedItem();
-            targetLang= (ILanguage) TargetSpinner.getSelectedItem();
-            text=textIn.getText().toString();
+            ILanguage sourceLang= (ILanguage) SourceSpinner.getSelectedItem();
+            ILanguage targetLang= (ILanguage) TargetSpinner.getSelectedItem();
+            String text=textIn.getText().toString();
+            CurrentWord=new TOneWord(sourceLang, targetLang, text);
+            int iWord=historyList.indexOf(CurrentWord);
+            if (iWord>0)
+                CurrentWord=historyList.get(iWord);
+            else
+            {
+                iWord=favoritList.indexOf(CurrentWord);
+                if (iWord>0)
+                    CurrentWord=favoritList.get(iWord);
+            }
+
         }
 
         @Override
         protected String doInBackground(ITranslator... params) {
-            return params[0].Translate(text, sourceLang, targetLang);
+            if (CurrentWord.getTargetText().equals(""))
+            {
+                return params[0].Translate(
+                        CurrentWord.getSourceText(),
+                        CurrentWord.getSourceLang(),
+                        CurrentWord.getTargetLang());
+            }
+            else return CurrentWord.getTargetText();
         }
 
         @Override
         protected void onPostExecute(String s) {
             textOut.setText(s);
+            if (CurrentWord.getTargetText().equals(""))
+            {
+                CurrentWord.setTargetText(s);
+                historyList.add(CurrentWord);
+            }
         }
     }
 
