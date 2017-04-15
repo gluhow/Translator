@@ -1,4 +1,11 @@
 <resources>
     <string name="app_name">Translator</string>
     <string name="editChangeLang"><![CDATA[<>]]></string>
+    <string name="TranslateMe">Перевести</string>
+    <string name="TranslateIt">Введите текст для перевода</string>
+    <string name="title_home">Home</string>
+    <string name="main">Главная</string>
+    <string name="history">История</string>
+    <string name="favorites">Избранное</string>
+    <string name="title_activity_history">История</string>
 </resources>
