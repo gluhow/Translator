@@ -1,14 +1,31 @@
 package ru.greenfil.translator;
 
 /**
- * Created by greenfil on 01.04.17.
+ * Объект, отвечающий за 1 язык
  */
 
-public class TLanguage implements ILanguage {
-    protected String caption;
-    protected String ui;
+class TLanguage implements ILanguage {
+    private String caption;
 
-    public TLanguage(String caption, String ui) {
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        TLanguage tLanguage = (TLanguage) o;
+
+        return ui.equals(tLanguage.ui);
+
+    }
+
+    @Override
+    public int hashCode() {
+        return ui.hashCode();
+    }
+
+    private String ui;
+
+    TLanguage(String caption, String ui) {
         this.caption = caption;
         this.ui = ui;
     }
@@ -18,17 +35,10 @@ public class TLanguage implements ILanguage {
         return caption;
     }
 
-    public void SetCaption(String AValue) {
-        caption=AValue;
-    }
 
     @Override
     public String GetUI() {
         return ui;
-    }
-
-    public void SetUI(String Avalue) {
-        ui=Avalue;
     }
 
     @Override
