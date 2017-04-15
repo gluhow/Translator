@@ -1,6 +1,7 @@
 package ru.greenfil.translator;
 
 import android.os.AsyncTask;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
@@ -28,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
     Button buttonSwap;
     ArrayList<TOneWord> historyList;
     ArrayList<TOneWord> favoritList;
+    FloatingActionButton favoritesButton;
     //OnLangChange LangChange;
 
     @Override
@@ -60,8 +62,38 @@ public class MainActivity extends AppCompatActivity {
         TargetSpinner.setSelection(1);
         TargetSpinner.setOnItemSelectedListener(langChange);
 
+        favoritesButton=(FloatingActionButton)findViewById(R.id.favoritesButton);
+
         historyList=new ArrayList<>();
         favoritList=new ArrayList<>();
+    }
+
+    TOneWord GetCurrentWord(){
+        ILanguage sourceLang= (ILanguage) SourceSpinner.getSelectedItem();
+        ILanguage targetLang= (ILanguage) TargetSpinner.getSelectedItem();
+        String text=textIn.getText().toString();
+        return new TOneWord(sourceLang, targetLang, text);
+    }
+
+    void UpdateFavoritButton(){
+        TOneWord CurrentWord=GetCurrentWord();
+        if (favoritList.contains(CurrentWord)) {
+            favoritesButton.setImageResource(R.drawable.favorite);
+        }
+        else favoritesButton.setImageResource(R.drawable.nonfavorite);
+    }
+
+    public void addFavorites(View view) {
+        TOneWord CurrentWord=GetCurrentWord();
+        if (favoritList.contains(CurrentWord)) {
+            favoritList.remove(CurrentWord);
+            favoritesButton.setImageResource(R.drawable.nonfavorite);
+        }
+        else {
+            CurrentWord.setTargetText(textOut.getText().toString());
+            favoritList.add(CurrentWord);
+            favoritesButton.setImageResource(R.drawable.favorite);
+        }
     }
 
     private class sourceTextChange implements TextWatcher{
@@ -73,6 +105,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {
             translateNow();
+            UpdateFavoritButton();
         }
 
         @Override
@@ -81,13 +114,14 @@ public class MainActivity extends AppCompatActivity {
         }
     }
     private void translateNow(){
-        //Надо подумать о снижении траффика во время ввода текста мобыть задержка?
         if (getTranslate!=null) {
             getTranslate.cancel(true);
         }
         getTranslate=new GetTranslate();
         getTranslate.execute(mytranslator);
     }
+
+
 
     private class GetTranslate
         extends AsyncTask<ITranslator, Void, String>{
@@ -97,10 +131,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected void onPreExecute() {
-            ILanguage sourceLang= (ILanguage) SourceSpinner.getSelectedItem();
-            ILanguage targetLang= (ILanguage) TargetSpinner.getSelectedItem();
-            String text=textIn.getText().toString();
-            CurrentWord=new TOneWord(sourceLang, targetLang, text);
+            CurrentWord=GetCurrentWord();
             int iWord=historyList.indexOf(CurrentWord);
             if (iWord>0)
                 CurrentWord=historyList.get(iWord);
@@ -130,7 +161,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 else return "";
             }
-            else return "Histrory!" + CurrentWord.getTargetText();
+            else return CurrentWord.getTargetText();
         }
 
         @Override
