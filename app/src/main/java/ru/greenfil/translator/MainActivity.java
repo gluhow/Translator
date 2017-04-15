@@ -122,10 +122,13 @@ public class MainActivity extends AppCompatActivity {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
+                if (!isCancelled()) {
                 return params[0].Translate(
                         CurrentWord.getSourceText(),
                         CurrentWord.getSourceLang(),
                         CurrentWord.getTargetLang());
+                }
+                else return "";
             }
             else return "Histrory!" + CurrentWord.getTargetText();
         }
