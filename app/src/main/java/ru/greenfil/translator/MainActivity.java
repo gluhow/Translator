@@ -1,7 +1,6 @@
 package ru.greenfil.translator;
 
 import android.content.Intent;
-import android.content.res.TypedArray;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
