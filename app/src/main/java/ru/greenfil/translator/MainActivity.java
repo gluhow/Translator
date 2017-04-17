@@ -1,12 +1,16 @@
 package ru.greenfil.translator;
 
 import android.content.Intent;
+import android.content.res.TypedArray;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -18,6 +22,9 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
+class tWordList extends ArrayList<TOneWord>{};
+class tLangList extends ArrayList<ILanguage>{};
+
 public class MainActivity extends AppCompatActivity {
 
     TextView textOut;
@@ -26,12 +33,14 @@ public class MainActivity extends AppCompatActivity {
     Spinner SourceSpinner;
     ArrayAdapter<ILanguage> langAdapter;
     Spinner TargetSpinner;
-    ArrayList<ILanguage> languageList;
+    tLangList languageList;
     GetTranslate getTranslate=null;
     Button buttonSwap;
-    ArrayList<TOneWord> historyList;
-    ArrayList<TOneWord> favoritList;
+    tWordList historyList;
+    tWordList favoritList;
     FloatingActionButton favoritesButton;
+    DBHelper dbHelper;
+
     //OnLangChange LangChange;
 
     @Override
@@ -44,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
         textIn.setText("Hello World!!!");
         textIn.addTextChangedListener(new sourceTextChange());
 
-        languageList=new ArrayList<>();
+        languageList=new tLangList();
         languageList.add(new TLanguage("English","en"));
         languageList.add(new TLanguage("Русский","ru"));
         buttonSwap=(Button)findViewById(R.id.buttonSwap);
@@ -66,8 +75,11 @@ public class MainActivity extends AppCompatActivity {
 
         favoritesButton=(FloatingActionButton)findViewById(R.id.favoritesButton);
 
-        historyList=new ArrayList<>();
-        favoritList=new ArrayList<>();
+        historyList=new tWordList();
+        favoritList=new tWordList();
+
+        dbHelper=new DBHelper(this);
+        LoadData();
     }
 
     TOneWord GetCurrentWord(){
@@ -85,11 +97,11 @@ public class MainActivity extends AppCompatActivity {
         else favoritesButton.setImageResource(R.drawable.nonfavorite);
     }
 
-/*    @Override
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
-    }*/
+    }
 
     public void addFavorites(View view) {
         TOneWord CurrentWord=GetCurrentWord();
@@ -205,5 +217,48 @@ public class MainActivity extends AppCompatActivity {
         public void onNothingSelected(AdapterView<?> parent) {
 
         }
+    }
+
+    void LoadData(){
+         new AsyncTask<tLangList, Void, tWordList>(){
+
+             @Override
+             protected tWordList doInBackground(tLangList... params) {
+                 SQLiteDatabase database = dbHelper.getWritableDatabase();
+                 tWordList historyList=new tWordList();
+                 Cursor cursor = database.query(DBHelper.TABLE_HISTORY, null, null, null, null, null, null);
+                 if (cursor.moveToFirst()) {
+                     int slIndex = cursor.getColumnIndex(DBHelper.KEY_SOURCE_LANG);
+                     int tlIndex = cursor.getColumnIndex(DBHelper.KEY_TARGET_LANG);
+                     int stIndex = cursor.getColumnIndex(DBHelper.KEY_SOURCE_TEXT);
+                     int ttIndex = cursor.getColumnIndex(DBHelper.KEY_TARGET_TEXT);
+                     do {
+                         int langIndex=params[0].indexOf(new TLanguage("", cursor.getString(slIndex)));
+                         if (langIndex>=0) {
+                             ILanguage sourceLang = params[0].get(langIndex);
+                             langIndex = params[0].indexOf(new TLanguage("", cursor.getString(tlIndex)));
+                             if (langIndex >= 0) {
+                                 ILanguage targetLang = params[0].get(langIndex);
+                                 if ((sourceLang!=null)&&(targetLang!=null))
+                                 {
+                                     TOneWord NextWord = new TOneWord(sourceLang, targetLang,
+                                             cursor.getString(stIndex));
+                                     NextWord.setTargetText(cursor.getString(ttIndex));
+                                     historyList.add(NextWord);
+                                 }
+                             }
+
+                         }
+                     } while (cursor.moveToNext());
+
+                 }
+                 return null;
+             }
+
+             @Override
+             protected void onPostExecute(tWordList tOneWords) {
+                 super.onPostExecute(tOneWords);
+             }
+         };
     }
 }
