@@ -7,5 +7,6 @@ package ru.greenfil.translator;
 
 interface ITranslator {
     String Translate(String MyText, ILanguage SourceLanguage, ILanguage TargetLanguage);
+    int ErrCode();
 //Позже можно подумать о подгрузке списка языков
 }
