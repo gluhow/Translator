@@ -16,7 +16,14 @@ import javax.net.ssl.HttpsURLConnection;
  */
 
 class YaTranslator implements ITranslator {
+    private final Integer some_error=1;
+    //private final Integer no_error=0;
+
+    private Integer fErrRes=some_error;
+
+
     private String GetWebAnswer(String text, String sourceLang, String targetLang) {
+        fErrRes=some_error;
         String yaURL="https://translate.yandex.net/api/v1.5/tr.json/translate ?";
         String params="";
         try {
@@ -70,11 +77,13 @@ class YaTranslator implements ITranslator {
         try {
             JSONObject resJSON = new JSONObject(text);
             JSONArray textAr = resJSON.getJSONArray("text");
-            /*if (resJSON.getInt("code")!=200)
+            if (resJSON.getInt("code")==200)
             {
-                return Integer.toString(resJSON.getInt("code"));
-            }*/
-            return (String) textAr.get(0);
+                fErrRes=0;
+                return (String) textAr.get(0);
+            }
+            return "";
+
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -85,5 +94,11 @@ class YaTranslator implements ITranslator {
     public String Translate(String MyText, ILanguage SourceLanguage, ILanguage TargetLanguage) {
         String WebAns = GetWebAnswer(MyText, SourceLanguage.GetUI(), TargetLanguage.GetUI());
         return GetTextFROMJSON(WebAns);
+        //Перенести формирование кодов ошибки сюда!
+    }
+
+    @Override
+    public int ErrCode() {
+        return fErrRes;
     }
 }
