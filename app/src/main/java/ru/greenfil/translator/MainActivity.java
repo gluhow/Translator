@@ -1,5 +1,6 @@
 package ru.greenfil.translator;
 
+import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -178,10 +179,12 @@ public class MainActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
                 if (!isCancelled()) {
-                return params[0].Translate(
+                String res=params[0].Translate(
                         CurrentWord.getSourceText(),
                         CurrentWord.getSourceLang(),
                         CurrentWord.getTargetLang());
+                    if (params[0].ErrCode()==0) return res;
+                        else return "";
                 }
                 else return "";
             }
@@ -191,12 +194,23 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String s) {
             textOut.setText(s);
-            if (CurrentWord.getTargetText().equals(""))
+            if ((CurrentWord.getTargetText().equals("")) & (s!=""))
             {
                 CurrentWord.setTargetText(s);
                 historyList.add(CurrentWord);
+                saveToHistory(CurrentWord);
             }
         }
+    }
+
+    private void saveToHistory(TOneWord currentWord) {
+        SQLiteDatabase database = dbHelper.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(dbHelper.KEY_SOURCE_LANG, currentWord.getSourceLang().GetUI());
+        contentValues.put(dbHelper.KEY_TARGET_LANG, currentWord.getTargetLang().GetUI());
+        contentValues.put(dbHelper.KEY_SOURCE_TEXT, currentWord.getSourceText());
+        contentValues.put(dbHelper.KEY_TARGET_TEXT, currentWord.getTargetText());
+        database.insert(dbHelper.TABLE_HISTORY, null, contentValues);
     }
 
     public void OnSwapLanguage(View view) {
@@ -219,14 +233,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
     void LoadData(){
-         new AsyncTask<tLangList, Void, tWordList>(){
+         tAsyncLoad asyncLoad=new tAsyncLoad();
+         asyncLoad.execute(languageList);
+    }
+    class tAsyncLoad extends AsyncTask<tLangList, Void, tWordList> {
 
-             @Override
-             protected tWordList doInBackground(tLangList... params) {
-                 SQLiteDatabase database = dbHelper.getWritableDatabase();
-                 tWordList historyList=new tWordList();
-                 Cursor cursor = database.query(DBHelper.TABLE_HISTORY, null, null, null, null, null, null);
-                 if (cursor.moveToFirst()) {
+        @Override
+        protected tWordList doInBackground(tLangList... params) {
+            SQLiteDatabase database= dbHelper.getWritableDatabase();
+            tWordList historyList=new tWordList();
+            Cursor cursor = database.query(DBHelper.TABLE_HISTORY, null, null, null, null, null, null);
+            if (cursor.moveToFirst()) {
                      int slIndex = cursor.getColumnIndex(DBHelper.KEY_SOURCE_LANG);
                      int tlIndex = cursor.getColumnIndex(DBHelper.KEY_TARGET_LANG);
                      int stIndex = cursor.getColumnIndex(DBHelper.KEY_SOURCE_TEXT);
@@ -250,14 +267,13 @@ public class MainActivity extends AppCompatActivity {
                          }
                      } while (cursor.moveToNext());
 
-                 }
-                 return null;
-             }
+            }
+            return historyList;
+        }
 
-             @Override
-             protected void onPostExecute(tWordList tOneWords) {
-                 super.onPostExecute(tOneWords);
-             }
-         };
+        @Override
+        protected void onPostExecute(tWordList LoadList) {
+            historyList =LoadList;
+        }
     }
 }
