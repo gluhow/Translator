@@ -10,7 +10,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class DBHelper extends SQLiteOpenHelper {
     public static final String TABLE_HISTORY = "history";
-    public static final String TABLE_FAVORITES = "history";
+    public static final String TABLE_FAVORITES = "favorites";
 
     public static final String KEY_ID = "_id";
     public static final String KEY_SOURCE_LANG = "sourceLang";
