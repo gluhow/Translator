@@ -16,7 +16,7 @@
         android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:menu="@menu/menu_main"
-        tools:layout_editor_absoluteX="1592dp">
+        tools:layout_editor_absoluteX="1856dp">
 
     </android.support.design.widget.BottomNavigationView>
 
@@ -88,7 +88,7 @@
 
     <TextView
         android:id="@+id/textView"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="33dp"
         android:layout_marginBottom="8dp"
         android:layout_marginLeft="8dp"
@@ -98,7 +98,9 @@
         android:text="Переведено сервисом «Яндекс-Переводчик»\nhttp://translate.yandex.ru/"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent" />
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/favoritesButton"
@@ -117,25 +119,29 @@
 
     <Spinner
         android:id="@+id/historySpinner"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
         app:layout_constraintBottom_toTopOf="@+id/textView"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent" />
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp" />
 
     <Spinner
         android:id="@+id/favoriteSpinner"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="25dp"
         android:layout_marginBottom="8dp"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
         app:layout_constraintBottom_toTopOf="@+id/historySpinner"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent" />
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp" />
 
     <Button
         android:id="@+id/button"
@@ -146,7 +152,8 @@
         android:text="Add"
         app:layout_constraintLeft_toLeftOf="parent"
         android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/favoriteSpinner" />
+        app:layout_constraintBottom_toTopOf="@+id/favoriteSpinner"
+        android:layout_marginStart="8dp" />
 
     <Button
         android:id="@+id/button2"
@@ -157,7 +164,8 @@
         android:text="Load"
         app:layout_constraintLeft_toRightOf="@+id/button"
         android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/favoriteSpinner" />
+        app:layout_constraintBottom_toTopOf="@+id/favoriteSpinner"
+        android:layout_marginStart="8dp" />
 
     <Button
         android:id="@+id/button3"
@@ -168,6 +176,7 @@
         android:text="Clear"
         app:layout_constraintLeft_toRightOf="@+id/button2"
         android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/favoriteSpinner" />
+        app:layout_constraintBottom_toTopOf="@+id/favoriteSpinner"
+        android:layout_marginStart="8dp" />
 
 </android.support.constraint.ConstraintLayout>
