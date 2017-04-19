@@ -18,14 +18,14 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String KEY_SOURCE_TEXT = "sourceText";
     public static final String KEY_TARGET_TEXT = "targetText";
     private static final String DATABASE_NAME =  "translatorDB";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 8;
 
     private String getCreateSQL(String db_Name){
         return "create table " + db_Name + "(" +
                 KEY_ID + " integer primary key," +
                 KEY_SOURCE_LANG + " text," +
-                KEY_TARGET_LANG + " text" +
-                KEY_SOURCE_TEXT + " text" +
+                KEY_TARGET_LANG + " text," +
+                KEY_SOURCE_TEXT + " text," +
                 KEY_TARGET_TEXT + " text" +
                 ")"; //надо поставить уникальность на первые 3 поля
     }
