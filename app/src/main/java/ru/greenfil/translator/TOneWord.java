@@ -33,7 +33,10 @@ class TOneWord {
 
     @Override
     public String toString() {
-        return sourceText;
+        return String.format("%s<%s-%s>%s",
+                sourceText,
+                getSourceLang().GetUI(), getTargetLang().GetUI(),
+                targetText);
     }
 
     void setTargetText(String targetText) {
