@@ -16,7 +16,7 @@
         android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:menu="@menu/menu_main"
-        tools:layout_editor_absoluteX="8dp">
+        tools:layout_editor_absoluteX="1592dp">
 
     </android.support.design.widget.BottomNavigationView>
 
@@ -81,24 +81,24 @@
         android:id="@+id/outputText"
         android:layout_width="344dp"
         android:layout_height="0dp"
-        android:layout_marginBottom="8dp"
         android:layout_marginTop="8dp"
         android:text="TextView"
-        app:layout_constraintBottom_toTopOf="@+id/textView"
         app:layout_constraintTop_toBottomOf="@+id/InputText"
-        app:layout_constraintVertical_bias="0.0"
         tools:layout_editor_absoluteX="8dp" />
 
     <TextView
         android:id="@+id/textView"
-        android:layout_width="344dp"
+        android:layout_width="match_parent"
         android:layout_height="33dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
         android:autoLink="web"
         android:gravity="center_horizontal"
         android:text="Переведено сервисом «Яндекс-Переводчик»\nhttp://translate.yandex.ru/"
-        tools:layout_editor_absoluteX="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginBottom="8dp" />
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/favoritesButton"
@@ -114,5 +114,60 @@
         app:layout_constraintTop_toTopOf="@+id/outputText"
         app:srcCompat="@drawable/nonfavorite"
         android:layout_marginEnd="8dp" />
+
+    <Spinner
+        android:id="@+id/historySpinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/textView"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent" />
+
+    <Spinner
+        android:id="@+id/favoriteSpinner"
+        android:layout_width="match_parent"
+        android:layout_height="25dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/historySpinner"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent" />
+
+    <Button
+        android:id="@+id/button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:onClick="historyAddClick"
+        android:text="Add"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/favoriteSpinner" />
+
+    <Button
+        android:id="@+id/button2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:onClick="historyLoadClick"
+        android:text="Load"
+        app:layout_constraintLeft_toRightOf="@+id/button"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/favoriteSpinner" />
+
+    <Button
+        android:id="@+id/button3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:onClick="historyClearClick"
+        android:text="Clear"
+        app:layout_constraintLeft_toRightOf="@+id/button2"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/favoriteSpinner" />
 
 </android.support.constraint.ConstraintLayout>
