@@ -8,6 +8,7 @@ class TOneWord {
     private ILanguage sourceLang;
     private ILanguage targetLang;
     private String sourceText;
+    private String targetText;
 
     @Override
     public boolean equals(Object o) {
@@ -30,11 +31,14 @@ class TOneWord {
         return result;
     }
 
+    @Override
+    public String toString() {
+        return sourceText;
+    }
+
     void setTargetText(String targetText) {
         this.targetText = targetText;
     }
-
-    private String targetText;
 
     ILanguage getSourceLang() {
         return sourceLang;
