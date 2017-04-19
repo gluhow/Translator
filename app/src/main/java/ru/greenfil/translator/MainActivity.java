@@ -40,6 +40,8 @@ public class MainActivity extends AppCompatActivity {
     tWordList favoritList;
     FloatingActionButton favoritesButton;
     DBHelper dbHelper;
+    Spinner historySpinner;
+    Spinner favoriteSpinner;
 
     //OnLangChange LangChange;
 
@@ -78,8 +80,12 @@ public class MainActivity extends AppCompatActivity {
         historyList=new tWordList();
         favoritList=new tWordList();
 
+        historySpinner=(Spinner)findViewById(R.id.historySpinner);
+        favoriteSpinner=(Spinner)findViewById(R.id.favoriteSpinner);
+
         dbHelper=new DBHelper(this);
         LoadData();
+        //setAdapter();
     }
 
     TOneWord GetCurrentWord(){
@@ -119,6 +125,34 @@ public class MainActivity extends AppCompatActivity {
     public void historyClick(MenuItem item) {
         Intent history=new Intent(MainActivity.this, History.class);
         startActivity(history);
+    }
+
+    public void historyAddClick(View view) {
+        TOneWord curWord=GetCurrentWord();
+        saveToHistory(curWord);
+    }
+
+    public void historyLoadClick(View view) {
+        historyList.clear();
+        SQLiteDatabase database= dbHelper.getWritableDatabase();
+        Cursor cursor = database.query(DBHelper.TABLE_HISTORY, null, null, null, null, null, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                ILanguage sourceLang = languageList.get(0);
+                ILanguage targetLang = languageList.get(0);
+                TOneWord word = new TOneWord(sourceLang, targetLang, "Test");
+                word.setTargetText("test");
+                historyList.add(word);
+            } while (cursor.moveToNext());
+        }
+        dbHelper.close();
+
+            //LoadData();
+    }
+
+    public void historyClearClick(View view) {
+        historyList.clear();
     }
 
     private class sourceTextChange implements TextWatcher{
@@ -197,20 +231,27 @@ public class MainActivity extends AppCompatActivity {
             if ((CurrentWord.getTargetText().equals("")) & (s!=""))
             {
                 CurrentWord.setTargetText(s);
-                historyList.add(CurrentWord);
+                //historyList.add(CurrentWord);
                 saveToHistory(CurrentWord);
             }
         }
     }
 
     private void saveToHistory(TOneWord currentWord) {
-        SQLiteDatabase database = dbHelper.getWritableDatabase();
-        ContentValues contentValues = new ContentValues();
-        contentValues.put(dbHelper.KEY_SOURCE_LANG, currentWord.getSourceLang().GetUI());
-        contentValues.put(dbHelper.KEY_TARGET_LANG, currentWord.getTargetLang().GetUI());
-        contentValues.put(dbHelper.KEY_SOURCE_TEXT, currentWord.getSourceText());
-        contentValues.put(dbHelper.KEY_TARGET_TEXT, currentWord.getTargetText());
-        database.insert(dbHelper.TABLE_HISTORY, null, contentValues);
+        if (!historyList.contains(currentWord)) {
+            historyList.add(currentWord);
+            SQLiteDatabase database = dbHelper.getWritableDatabase();
+            ContentValues contentValues = new ContentValues();
+            contentValues.put(dbHelper.KEY_SOURCE_LANG, currentWord.getSourceLang().GetUI());
+            contentValues.put(dbHelper.KEY_TARGET_LANG, currentWord.getTargetLang().GetUI());
+            contentValues.put(dbHelper.KEY_SOURCE_TEXT, currentWord.getSourceText());
+            contentValues.put(dbHelper.KEY_TARGET_TEXT, currentWord.getTargetText());
+        /*contentValues.put(DBHelper.KEY_SOURCE_LANG, "en");
+        contentValues.put(DBHelper.KEY_TARGET_TEXT, "Hello");*/
+
+            database.insert(dbHelper.TABLE_HISTORY, null, contentValues);
+            dbHelper.close();
+        }
     }
 
     public void OnSwapLanguage(View view) {
@@ -240,22 +281,25 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected tWordList doInBackground(tLangList... params) {
-            SQLiteDatabase database= dbHelper.getWritableDatabase();
             tWordList historyList=new tWordList();
+
+            SQLiteDatabase database= dbHelper.getReadableDatabase();
             Cursor cursor = database.query(DBHelper.TABLE_HISTORY, null, null, null, null, null, null);
+
             if (cursor.moveToFirst()) {
-                     int slIndex = cursor.getColumnIndex(DBHelper.KEY_SOURCE_LANG);
-                     int tlIndex = cursor.getColumnIndex(DBHelper.KEY_TARGET_LANG);
-                     int stIndex = cursor.getColumnIndex(DBHelper.KEY_SOURCE_TEXT);
-                     int ttIndex = cursor.getColumnIndex(DBHelper.KEY_TARGET_TEXT);
-                     do {
+                int slIndex = cursor.getColumnIndex(DBHelper.KEY_SOURCE_LANG);
+                int tlIndex = cursor.getColumnIndex(DBHelper.KEY_TARGET_LANG);
+                int stIndex = cursor.getColumnIndex(DBHelper.KEY_SOURCE_TEXT);
+                int ttIndex = cursor.getColumnIndex(DBHelper.KEY_TARGET_TEXT);
+
+                do {
                          int langIndex=params[0].indexOf(new TLanguage("", cursor.getString(slIndex)));
                          if (langIndex>=0) {
                              ILanguage sourceLang = params[0].get(langIndex);
                              langIndex = params[0].indexOf(new TLanguage("", cursor.getString(tlIndex)));
                              if (langIndex >= 0) {
                                  ILanguage targetLang = params[0].get(langIndex);
-                                 if ((sourceLang!=null)&&(targetLang!=null))
+                                 if ((sourceLang!=null)&(targetLang!=null))
                                  {
                                      TOneWord NextWord = new TOneWord(sourceLang, targetLang,
                                              cursor.getString(stIndex));
@@ -268,12 +312,22 @@ public class MainActivity extends AppCompatActivity {
                      } while (cursor.moveToNext());
 
             }
+            dbHelper.close();
             return historyList;
         }
 
         @Override
         protected void onPostExecute(tWordList LoadList) {
             historyList =LoadList;
+            setAdapter();
+
         }
+    }
+
+    private void setAdapter() {
+        ArrayAdapter<TOneWord>
+                historyAdapter= new ArrayAdapter<TOneWord>(this, android.R.layout.simple_spinner_item, historyList);
+        historyAdapter.setDropDownViewResource(android.R.layout.simple_spinner_item);
+        historySpinner.setAdapter(historyAdapter);
     }
 }
