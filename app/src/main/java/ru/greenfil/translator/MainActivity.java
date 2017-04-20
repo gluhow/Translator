@@ -92,7 +92,13 @@ public class MainActivity extends AppCompatActivity {
         ILanguage sourceLang= (ILanguage) SourceSpinner.getSelectedItem();
         ILanguage targetLang= (ILanguage) TargetSpinner.getSelectedItem();
         String text=textIn.getText().toString();
-        return new TOneWord(sourceLang, targetLang, text);
+        TOneWord res=new TOneWord(sourceLang, targetLang, text);
+        if (mytranslator.ErrCode()==0){
+            res.setTargetText(textOut.getText().toString());
+        }
+        return res;
+
+
     }
 
     void UpdateFavoritButton(){
@@ -112,16 +118,12 @@ public class MainActivity extends AppCompatActivity {
     public void addFavorites(View view) {
         TOneWord CurrentWord=GetCurrentWord();
         if (favoritList.contains(CurrentWord)) {
-            //favoritList.remove(CurrentWord);
-            favoritesButton.setImageResource(R.drawable.nonfavorite);
             RemoveFromFavorite(CurrentWord);
         }
         else {
-            CurrentWord.setTargetText(textOut.getText().toString());
-            //favoritList.add(CurrentWord);
-            favoritesButton.setImageResource(R.drawable.favorite);
             SaveToFavorite(CurrentWord);
         }
+        UpdateFavoritButton();
     }
 
     private void SaveToFavorite(TOneWord currentWord) {
@@ -211,6 +213,7 @@ public class MainActivity extends AppCompatActivity {
         if (getTranslate!=null) {
             getTranslate.cancel(true);
         }
+        textOut.setText("");
         getTranslate=new GetTranslate();
         getTranslate.execute(mytranslator);
     }
