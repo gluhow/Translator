@@ -42,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
     DBHelper dbHelper;
     Spinner historySpinner;
     Spinner favoriteSpinner;
+    boolean fCurrentIsTranslated;
 
     //OnLangChange LangChange;
 
@@ -93,12 +94,10 @@ public class MainActivity extends AppCompatActivity {
         ILanguage targetLang= (ILanguage) TargetSpinner.getSelectedItem();
         String text=textIn.getText().toString();
         TOneWord res=new TOneWord(sourceLang, targetLang, text);
-        if (mytranslator.ErrCode()==0){
+        if (getCurrentIsTranslated()){
             res.setTargetText(textOut.getText().toString());
         }
         return res;
-
-
     }
 
     void UpdateFavoritButton(){
@@ -127,7 +126,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void SaveToFavorite(TOneWord currentWord) {
-        if (!favoritList.contains(currentWord)) {
+        if ((!favoritList.contains(currentWord)) & (currentWord.getTargetText().toString()!="")) {
             favoritList.add(currentWord);
             SQLiteDatabase database = dbHelper.getWritableDatabase();
             ContentValues contentValues = new ContentValues();
@@ -210,6 +209,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
     private void translateNow(){
+        setCurrentIsTranslated(false);
         if (getTranslate!=null) {
             getTranslate.cancel(true);
         }
@@ -224,6 +224,8 @@ public class MainActivity extends AppCompatActivity {
         extends AsyncTask<ITranslator, Void, String>{
 
         TOneWord CurrentWord;
+        final int some_error=1;
+        int errCode=some_error;
 
 
         @Override
@@ -238,7 +240,7 @@ public class MainActivity extends AppCompatActivity {
                 if (iWord>0)
                     CurrentWord=favoritList.get(iWord);
             }
-
+            if (CurrentWord.getTargetText()!=null){errCode=0;}
         }
 
         @Override
@@ -255,7 +257,10 @@ public class MainActivity extends AppCompatActivity {
                         CurrentWord.getSourceText(),
                         CurrentWord.getSourceLang(),
                         CurrentWord.getTargetLang());
-                    if (params[0].ErrCode()==0) return res;
+                    if (params[0].ErrCode()==0) {
+                        errCode=0;
+                        return res;
+                    }
                         else return "";
                 }
                 else return "";
@@ -270,6 +275,9 @@ public class MainActivity extends AppCompatActivity {
             {
                 CurrentWord.setTargetText(s);
                 saveToHistory(CurrentWord);
+            }
+            if (errCode==0) {
+                setCurrentIsTranslated(true);
             }
         }
     }
@@ -395,4 +403,13 @@ public class MainActivity extends AppCompatActivity {
         favoriteAdapter.setDropDownViewResource(android.R.layout.simple_spinner_item);
         favoriteSpinner.setAdapter(favoriteAdapter);
     }
+
+    boolean getCurrentIsTranslated() {
+        return fCurrentIsTranslated;
+    };
+
+    void setCurrentIsTranslated(boolean aValue){
+        fCurrentIsTranslated=aValue;
+    }
+
 }
