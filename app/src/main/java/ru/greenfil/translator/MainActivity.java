@@ -110,6 +110,9 @@ public class MainActivity extends AppCompatActivity {
             textOut.setText(word.getTargetText());
             UpdateFavoritButton();
         }
+        else {
+            textOut.setText("");
+        }
     }
 
     void UpdateFavoritButton() {
@@ -204,7 +207,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     private class GetTranslate
-            extends AsyncTask<ITranslator, Void, String> {
+            extends AsyncTask<ITranslator, Void, TOneWord> {
 
         TOneWord CurrentWord;
         final int some_error = 1;
@@ -215,9 +218,14 @@ public class MainActivity extends AppCompatActivity {
         protected void onPreExecute() {
             SetCurrentWord(null);
 
+            String text = textIn.getText().toString().trim();
+            if (text.equals("")){
+                errCode=0;
+                CurrentWord=null;
+                return;
+            }
             ILanguage sourceLang = (ILanguage) SourceSpinner.getSelectedItem();
             ILanguage targetLang = (ILanguage) TargetSpinner.getSelectedItem();
-            String text = textIn.getText().toString().trim();
 
             CurrentWord = new TOneWord(sourceLang, targetLang, text);
 
@@ -236,7 +244,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        protected String doInBackground(ITranslator... params) {
+        protected TOneWord doInBackground(ITranslator... params) {
             if (errCode!=0) {
                 try {
                     Thread.sleep(1000); //Задержка перед переводом для сохранения траффика
@@ -245,25 +253,22 @@ public class MainActivity extends AppCompatActivity {
                 }
                 if (!isCancelled()) {
                     ITranslator translator=params[0];
-                    String res = translator.Translate(
+                    CurrentWord.setTargetText(translator.Translate(
                             CurrentWord.getSourceText(),
                             CurrentWord.getSourceLang(),
-                            CurrentWord.getTargetLang());
-                    if (translator.ErrCode() == 0) {
-                        errCode = 0;
-                        return res;
-                    } else return "";
-                } else return "";
-            } else return CurrentWord.getTargetText();
+                            CurrentWord.getTargetLang()));
+                    errCode=translator.ErrCode();
+                }
+            }
+            return CurrentWord;
         }
 
         @Override
-        protected void onPostExecute(String s) {
+        protected void onPostExecute(TOneWord word) {
             if (errCode==0)
             {
-                CurrentWord.setTargetText(s);
-                SetCurrentWord(CurrentWord);
-                saveToHistory(CurrentWord);
+                SetCurrentWord(word);
+                saveToHistory(word);
             }
             else
             {
@@ -273,6 +278,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void saveToHistory(TOneWord currentWord) {
+        if (currentWord==null) return;
         if (!historyList.contains(currentWord)) {
             SQLiteDatabase database = dbHelper.getWritableDatabase();
             ContentValues contentValues = new ContentValues();
