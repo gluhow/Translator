@@ -213,6 +213,8 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected void onPreExecute() {
+            SetCurrentWord(null);
+
             ILanguage sourceLang = (ILanguage) SourceSpinner.getSelectedItem();
             ILanguage targetLang = (ILanguage) TargetSpinner.getSelectedItem();
             String text = textIn.getText().toString().trim();
@@ -220,23 +222,22 @@ public class MainActivity extends AppCompatActivity {
             CurrentWord = new TOneWord(sourceLang, targetLang, text);
 
             int iWord = historyList.indexOf(CurrentWord);
-            if (iWord > 0) {
+            if (iWord >= 0) {
                 CurrentWord = historyList.get(iWord);
+                errCode=0;
             }
             else {
                 iWord = favoritList.indexOf(CurrentWord);
-                if (iWord > 0)
+                if (iWord >= 0){
                     CurrentWord = favoritList.get(iWord);
+                    errCode=0;
+                }
             }
-            if (CurrentWord.getTargetText() != null) {
-                errCode = 0;
-            }
-            SetCurrentWord(null);
         }
 
         @Override
         protected String doInBackground(ITranslator... params) {
-            if (CurrentWord.getTargetText().equals("")) {
+            if (errCode!=0) {
                 try {
                     Thread.sleep(1000); //Задержка перед переводом для сохранения траффика
                 } catch (InterruptedException e) {
@@ -273,7 +274,6 @@ public class MainActivity extends AppCompatActivity {
 
     private void saveToHistory(TOneWord currentWord) {
         if (!historyList.contains(currentWord)) {
-            historyList.add(currentWord);
             SQLiteDatabase database = dbHelper.getWritableDatabase();
             ContentValues contentValues = new ContentValues();
             contentValues.put(dbHelper.KEY_SOURCE_LANG, currentWord.getSourceLang().GetUI());
@@ -284,6 +284,11 @@ public class MainActivity extends AppCompatActivity {
             database.insert(dbHelper.TABLE_HISTORY, null, contentValues);
             dbHelper.close();
         }
+        else
+        {
+            historyList.remove(currentWord);
+        }
+        historyList.add(0, currentWord);
     }
 
     public void OnSwapLanguage(View view) {
