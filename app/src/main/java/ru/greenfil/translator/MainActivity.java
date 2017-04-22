@@ -44,9 +44,7 @@ public class MainActivity extends AppCompatActivity {
     DBHelper dbHelper;
     BottomNavigationView navigation;
     ListView wordListView;
-    boolean fCurrentIsTranslated;
-
-    //OnLangChange LangChange;
+    TOneWord fCurrentWord;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,18 +86,30 @@ public class MainActivity extends AppCompatActivity {
         navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
         wordListView = (ListView) findViewById(R.id.wordListView);
+        //wordListView.setOnItemSelectedListener(new wordListener());]
+        wordListView.setOnItemClickListener(new wordListener());
         LoadData();
     }
 
     TOneWord GetCurrentWord() {
-        ILanguage sourceLang = (ILanguage) SourceSpinner.getSelectedItem();
-        ILanguage targetLang = (ILanguage) TargetSpinner.getSelectedItem();
-        String text = textIn.getText().toString();
-        TOneWord res = new TOneWord(sourceLang, targetLang, text);
-        if (getCurrentIsTranslated()) {
-            res.setTargetText(textOut.getText().toString());
+        return fCurrentWord;
+    }
+
+    void SetCurrentWord(TOneWord word){
+        fCurrentWord=word;
+        if (word!=null){
+            if (!textIn.getText().toString().equals(word.getSourceText()))            {
+                textIn.setText(word.getSourceText());
+            }
+            if (!SourceSpinner.getSelectedItem().equals(word.getSourceLang())){
+                SourceSpinner.setSelection(languageList.indexOf(word.getSourceLang()));
+            }
+            if (!TargetSpinner.getSelectedItem().equals(word.getTargetLang())){
+                TargetSpinner.setSelection(languageList.indexOf(word.getTargetLang()));
+            }
+            textOut.setText(word.getTargetText());
+            UpdateFavoritButton();
         }
-        return res;
     }
 
     void UpdateFavoritButton() {
@@ -111,16 +121,19 @@ public class MainActivity extends AppCompatActivity {
 
     public void addFavorites(View view) {
         TOneWord CurrentWord = GetCurrentWord();
-        if (favoritList.contains(CurrentWord)) {
-            RemoveFromFavorite(CurrentWord);
-        } else {
-            SaveToFavorite(CurrentWord);
+        if (CurrentWord!=null)
+        {
+            if (favoritList.contains(CurrentWord)) {
+                RemoveFromFavorite(CurrentWord);
+            } else {
+                SaveToFavorite(CurrentWord);
+            }
+            UpdateFavoritButton();
         }
-        UpdateFavoritButton();
     }
 
     private void SaveToFavorite(TOneWord currentWord) {
-        if ((!favoritList.contains(currentWord)) & (currentWord.getTargetText().toString() != "")) {
+        if (!favoritList.contains(currentWord)) {
             favoritList.add(currentWord);
             SQLiteDatabase database = dbHelper.getWritableDatabase();
             ContentValues contentValues = new ContentValues();
@@ -139,8 +152,6 @@ public class MainActivity extends AppCompatActivity {
             favoritList.remove(currentWord);
             SQLiteDatabase database = dbHelper.getWritableDatabase();
             database.execSQL(
-                    //textOut.setText(String.format("%s '%s'", "testformat", "2test"));
-                    //textOut.setText(
                     String.format(
                             "DELETE FROM %s WHERE %s='%s' AND %s='%s' AND %s='%s'",
                             dbHelper.TABLE_FAVORITES,
@@ -153,6 +164,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     void SetVisibleAll(int vis) {
+        //Не надо сюда смотреть! Просто я не разобрался с фрагментами и передачей данных между ними
+        //поэтому я тупо скрываю и показываю нужные элементы
         textIn.setVisibility(vis);
         textOut.setVisibility(vis);
         SourceSpinner.setVisibility(vis);
@@ -182,11 +195,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void translateNow() {
-        setCurrentIsTranslated(false);
+        //SetCurrentWord(null);
+        //setCurrentIsTranslated(false);
         if (getTranslate != null) {
             getTranslate.cancel(true);
         }
-        textOut.setText("");
+        //textOut.setText("");
         getTranslate = new GetTranslate();
         getTranslate.execute(mytranslator);
     }
@@ -202,10 +216,16 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected void onPreExecute() {
-            CurrentWord = GetCurrentWord();
+            ILanguage sourceLang = (ILanguage) SourceSpinner.getSelectedItem();
+            ILanguage targetLang = (ILanguage) TargetSpinner.getSelectedItem();
+            String text = textIn.getText().toString();
+
+            CurrentWord = new TOneWord(sourceLang, targetLang, text);
+
             int iWord = historyList.indexOf(CurrentWord);
-            if (iWord > 0)
+            if (iWord > 0) {
                 CurrentWord = historyList.get(iWord);
+            }
             else {
                 iWord = favoritList.indexOf(CurrentWord);
                 if (iWord > 0)
@@ -214,6 +234,7 @@ public class MainActivity extends AppCompatActivity {
             if (CurrentWord.getTargetText() != null) {
                 errCode = 0;
             }
+            SetCurrentWord(null);
         }
 
         @Override
@@ -225,11 +246,12 @@ public class MainActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
                 if (!isCancelled()) {
-                    String res = params[0].Translate(
+                    ITranslator translator=params[0];
+                    String res = translator.Translate(
                             CurrentWord.getSourceText(),
                             CurrentWord.getSourceLang(),
                             CurrentWord.getTargetLang());
-                    if (params[0].ErrCode() == 0) {
+                    if (translator.ErrCode() == 0) {
                         errCode = 0;
                         return res;
                     } else return "";
@@ -239,13 +261,16 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(String s) {
-            textOut.setText(s);
-            if ((CurrentWord.getTargetText().equals("")) & (s != "")) {
+            if (errCode==0)
+            {
                 CurrentWord.setTargetText(s);
+                SetCurrentWord(CurrentWord);
                 saveToHistory(CurrentWord);
+
             }
-            if (errCode == 0) {
-                setCurrentIsTranslated(true);
+            else
+            {
+                textOut.setText(/*GetErrorCaption(errcode)*/ getString(R.string.someError));
             }
         }
     }
@@ -281,6 +306,14 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onNothingSelected(AdapterView<?> parent) {
 
+        }
+    }
+    private class wordListener implements ListView.OnItemClickListener {
+
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            SetCurrentWord((TOneWord)parent.getItemAtPosition(position));
+            navigation.setSelectedItemId(R.id.action_home);
         }
     }
 
@@ -359,16 +392,6 @@ public class MainActivity extends AppCompatActivity {
         return (new tOneWordAdapter(this, R.layout.word_item, list, favoritList));
     }
 
-    boolean getCurrentIsTranslated() {
-        return fCurrentIsTranslated;
-    }
-
-    ;
-
-    void setCurrentIsTranslated(boolean aValue) {
-        fCurrentIsTranslated = aValue;
-    }
-
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
 
@@ -390,4 +413,6 @@ public class MainActivity extends AppCompatActivity {
             return false;
         }
     };
+
+    //AdapterView.OnItemSelectedListener wordSelect=new
 }
