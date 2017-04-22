@@ -143,40 +143,4 @@
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp" />
 
-    <Button
-        android:id="@+id/button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="8dp"
-        android:onClick="historyAddClick"
-        android:text="Add"
-        app:layout_constraintLeft_toLeftOf="parent"
-        android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/favoriteSpinner"
-        android:layout_marginStart="8dp" />
-
-    <Button
-        android:id="@+id/button2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="8dp"
-        android:onClick="historyLoadClick"
-        android:text="Load"
-        app:layout_constraintLeft_toRightOf="@+id/button"
-        android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/favoriteSpinner"
-        android:layout_marginStart="8dp" />
-
-    <Button
-        android:id="@+id/button3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="8dp"
-        android:onClick="historyClearClick"
-        android:text="Clear"
-        app:layout_constraintLeft_toRightOf="@+id/button2"
-        android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/favoriteSpinner"
-        android:layout_marginStart="8dp" />
-
 </android.support.constraint.ConstraintLayout>
