@@ -53,8 +53,4 @@ class tOneWordAdapter extends ArrayAdapter<TOneWord> {
 
         return convertView;
     }
-
-    /*public tOneWordAdapter(Context context){
-        super(context, android.R.layout.simple_list_item_2, (TOneWord[]) null);
-    }*/
 }
