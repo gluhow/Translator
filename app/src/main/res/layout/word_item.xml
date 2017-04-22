@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:columnCount="3">
+
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_height="0dp"
+        android:layout_column="0"
+        android:layout_gravity="fill_vertical"
+        android:layout_row="0"
+        android:layout_rowSpan="2"
+        android:contentDescription="@string/favorites"
+        app:srcCompat="@drawable/favorite" />
+
+    <TextView
+        android:id="@+id/sourceText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_column="1"
+        android:layout_columnWeight="1"
+        android:layout_gravity="fill_horizontal"
+        android:layout_marginLeft="8dp"
+        android:layout_row="0"
+        android:text="@string/sourceText"
+        android:textAppearance="@style/TextAppearance.AppCompat.Button" />
+
+    <TextView
+        android:id="@+id/sourceLang"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_column="2"
+        android:layout_gravity="fill_horizontal"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_row="0"
+        android:text="@string/sourceLang" />
+
+    <TextView
+        android:id="@+id/targetLang"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_column="2"
+        android:layout_gravity="fill_horizontal"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_row="1"
+        android:text="@string/tergetLang" />
+
+    <TextView
+        android:id="@+id/targetText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_column="1"
+        android:layout_gravity="fill_horizontal"
+        android:layout_marginLeft="8dp"
+        android:layout_row="1"
+        android:text="@string/targetText" />
+
+</GridLayout>
