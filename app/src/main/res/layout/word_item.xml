@@ -27,7 +27,8 @@
         android:layout_marginTop="8dp"
         android:layout_row="0"
         android:text="@string/sourceText"
-        android:textAppearance="@style/TextAppearance.AppCompat.Button" />
+        android:textAppearance="@style/TextAppearance.AppCompat"
+        android:textSize="18sp" />
 
     <TextView
         android:id="@+id/sourceLang"
