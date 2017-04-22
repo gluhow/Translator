@@ -17,9 +17,9 @@ class TOneWord {
 
         TOneWord tOneWord = (TOneWord) o;
 
-        return sourceLang.equals(tOneWord.sourceLang) &&
-                targetLang.equals(tOneWord.targetLang) &&
-                sourceText.equals(tOneWord.sourceText);
+        return sourceLang.equals(tOneWord.sourceLang) &
+                targetLang.equals(tOneWord.targetLang) &
+                sourceText.trim().equals(tOneWord.sourceText.trim());
 
     }
 
