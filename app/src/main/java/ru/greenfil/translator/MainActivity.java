@@ -163,35 +163,7 @@ public class MainActivity extends AppCompatActivity {
         startActivity(history);
     }
 
-    public void historyAddClick(View view) {
-        TOneWord curWord=GetCurrentWord();
-        saveToHistory(curWord);
-    }
-
-    public void historyLoadClick(View view) {
-        historyList.clear();
-        SQLiteDatabase database= dbHelper.getWritableDatabase();
-        Cursor cursor = database.query(DBHelper.TABLE_HISTORY, null, null, null, null, null, null);
-
-        if (cursor.moveToFirst()) {
-            do {
-                ILanguage sourceLang = languageList.get(0);
-                ILanguage targetLang = languageList.get(0);
-                TOneWord word = new TOneWord(sourceLang, targetLang, "Test");
-                word.setTargetText("test");
-                historyList.add(word);
-            } while (cursor.moveToNext());
-        }
-        dbHelper.close();
-
-            //LoadData();
-    }
-
-    public void historyClearClick(View view) {
-        historyList.clear();
-    }
-
-    private class sourceTextChange implements TextWatcher{
+     private class sourceTextChange implements TextWatcher{
         @Override
         public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
@@ -366,7 +338,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             protected void onPostExecute(tWordList LoadList) {
                 historyList=LoadList;
-                setHistoryAdapter();
+                setAdapter();
             }
         }
         class tAsyncFavoriteLoad extends tAsyncLoad{
@@ -378,7 +350,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             protected void onPostExecute(tWordList tOneWords) {
                 favoritList=tOneWords;
-                setFavoriteAdapter();
+                setAdapter();
             }
         }
 
@@ -390,21 +362,23 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void setHistoryAdapter() {
-        ArrayAdapter<TOneWord>
+    private void setAdapter() {
+        /*ArrayAdapter<TOneWord>
                 historyAdapter= new ArrayAdapter<TOneWord>(this, android.R.layout.simple_spinner_item, historyList);
-        historyAdapter.setDropDownViewResource(android.R.layout.simple_spinner_item);
+        historyAdapter.setDropDownViewResource(android.R.layout.simple_spinner_item);*/
+        tOneWordAdapter historyAdapter =
+                new tOneWordAdapter(this, R.layout.word_item, historyList, favoritList);
+        historyAdapter.setDropDownViewResource(android.R.layout.simple_list_item_1);
         historySpinner.setAdapter(historyAdapter);
-    }
 
-    private void setFavoriteAdapter() {
         ArrayAdapter<TOneWord>
                 favoriteAdapter=new ArrayAdapter<TOneWord>(this, android.R.layout.simple_spinner_item, favoritList);
         favoriteAdapter.setDropDownViewResource(android.R.layout.simple_spinner_item);
         favoriteSpinner.setAdapter(favoriteAdapter);
+
     }
 
-    boolean getCurrentIsTranslated() {
+     boolean getCurrentIsTranslated() {
         return fCurrentIsTranslated;
     };
 
