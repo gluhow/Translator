@@ -12,4 +12,5 @@
     <string name="sourceLang">sourceLang</string>
     <string name="targetText">targetText</string>
     <string name="targetLang">targetLang</string>
+    <string name="someError">Ошибка при попытке перевода</string>
 </resources>
