@@ -10,6 +10,6 @@
     <string name="title_activity_history">История</string>
     <string name="sourceText">sourceText</string>
     <string name="sourceLang">sourceLang</string>
-    <string name="tergetLang">tergetLang</string>
     <string name="targetText">targetText</string>
+    <string name="targetLang">targetLang</string>
 </resources>
