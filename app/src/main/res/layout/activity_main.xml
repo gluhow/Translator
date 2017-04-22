@@ -13,10 +13,10 @@
         android:layout_gravity="bottom"
         android:layout_marginBottom="8dp"
         android:background="?android:attr/windowBackground"
-        android:visibility="invisible"
+        android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:menu="@menu/menu_main"
-        tools:layout_editor_absoluteX="1856dp">
+        tools:layout_editor_absoluteX="2384dp">
 
     </android.support.design.widget.BottomNavigationView>
 
@@ -117,30 +117,18 @@
         app:srcCompat="@drawable/nonfavorite"
         android:layout_marginEnd="8dp" />
 
-    <Spinner
-        android:id="@+id/historySpinner"
+    <ListView
+        android:id="@+id/wordListView"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
+        android:layout_height="0dp"
+        android:layout_marginBottom="0dp"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/textView"
+        android:layout_marginTop="8dp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="@+id/textView"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp" />
-
-    <Spinner
-        android:id="@+id/favoriteSpinner"
-        android:layout_width="0dp"
-        android:layout_height="25dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/historySpinner"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp" />
+        app:layout_constraintTop_toTopOf="parent" />
 
 </android.support.constraint.ConstraintLayout>
