@@ -98,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
     void SetCurrentWord(TOneWord word){
         fCurrentWord=word;
         if (word!=null){
-            if (!textIn.getText().toString().equals(word.getSourceText()))            {
+            if (!word.getSourceText().equals(textIn.getText().toString().trim()))            {
                 textIn.setText(word.getSourceText());
             }
             if (!SourceSpinner.getSelectedItem().equals(word.getSourceLang())){
@@ -195,12 +195,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void translateNow() {
-        //SetCurrentWord(null);
-        //setCurrentIsTranslated(false);
         if (getTranslate != null) {
             getTranslate.cancel(true);
         }
-        //textOut.setText("");
         getTranslate = new GetTranslate();
         getTranslate.execute(mytranslator);
     }
@@ -218,7 +215,7 @@ public class MainActivity extends AppCompatActivity {
         protected void onPreExecute() {
             ILanguage sourceLang = (ILanguage) SourceSpinner.getSelectedItem();
             ILanguage targetLang = (ILanguage) TargetSpinner.getSelectedItem();
-            String text = textIn.getText().toString();
+            String text = textIn.getText().toString().trim();
 
             CurrentWord = new TOneWord(sourceLang, targetLang, text);
 
@@ -266,7 +263,6 @@ public class MainActivity extends AppCompatActivity {
                 CurrentWord.setTargetText(s);
                 SetCurrentWord(CurrentWord);
                 saveToHistory(CurrentWord);
-
             }
             else
             {
@@ -413,6 +409,4 @@ public class MainActivity extends AppCompatActivity {
             return false;
         }
     };
-
-    //AdapterView.OnItemSelectedListener wordSelect=new
 }
