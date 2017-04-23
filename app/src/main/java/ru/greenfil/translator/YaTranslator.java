@@ -102,8 +102,8 @@ class YaTranslator implements ITranslator {
      * Перевести текст
      */
     @Override
-    public String Translate(String MyText, ILanguage SourceLanguage, ILanguage TargetLanguage) {
-        String WebAns = GetWebAnswer(MyText, SourceLanguage.GetUI(), TargetLanguage.GetUI());
+    public String Translate(String MyText, String SourceLanguageUI, String TargetLanguageUI) {
+        String WebAns = GetWebAnswer(MyText, SourceLanguageUI, TargetLanguageUI);
         return GetTextFROMJSON(WebAns);
         //Перенести формирование кодов ошибки сюда!
     }

@@ -8,8 +8,8 @@ package ru.greenfil.translator;
 interface ITranslator {
     //**Получить перевод
     String Translate(String MyText, //Текст, который надо перевести
-                     ILanguage SourceLanguage, //Исходный язык
-                     ILanguage TargetLanguage   //Целевой язык
+                     String SourceLanguageUI, //Исходный язык
+                     String TargetLanguageUI   //Целевой язык
     );
     int ErrCode(); //Код ошибки. 0 - ошибок нет
 }

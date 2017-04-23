@@ -308,8 +308,8 @@ public class MainActivity extends AppCompatActivity {
                     ITranslator translator=params[0];
                     CurrentWord.setTargetText(translator.Translate(
                             CurrentWord.getSourceText(),
-                            CurrentWord.getSourceLang(),
-                            CurrentWord.getTargetLang()));
+                            CurrentWord.getSourceLang().GetUI(),
+                            CurrentWord.getTargetLang().GetUI()));
                     errCode=translator.ErrCode();
                 }
             }
