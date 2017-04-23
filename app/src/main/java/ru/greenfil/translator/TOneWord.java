@@ -5,13 +5,14 @@ package ru.greenfil.translator;
  */
 
 class TOneWord {
-    private ILanguage sourceLang;
-    private ILanguage targetLang;
-    private String sourceText;
-    private String targetText;
+    private ILanguage sourceLang;   //Исходный язык
+    private ILanguage targetLang;   //Целевой язык
+    private String sourceText;      //Исходный текст
+    private String targetText;      //Целевой текст
 
     @Override
     public boolean equals(Object o) {
+        /**Сравниваются только входные данные **/
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 

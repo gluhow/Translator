@@ -5,6 +5,6 @@ package ru.greenfil.translator;
  */
 
 interface ILanguage {
-    String GetCaption();
-    String GetUI();
+    String GetCaption(); //Название языка
+    String GetUI(); //Идентификатор языка
 }

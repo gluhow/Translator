@@ -1,12 +1,15 @@
 package ru.greenfil.translator;
 
 /**
- * Описание класса "Переводчик" без привязки к сервису
+ * Описание интерфейса переводчика без привязки к сервису
  */
 
 
 interface ITranslator {
-    String Translate(String MyText, ILanguage SourceLanguage, ILanguage TargetLanguage);
-    int ErrCode();
-//Позже можно подумать о подгрузке списка языков
+    //**Получить перевод
+    String Translate(String MyText, //Текст, который надо перевести
+                     ILanguage SourceLanguage, //Исходный язык
+                     ILanguage TargetLanguage   //Целевой язык
+    );
+    int ErrCode(); //Код ошибки. 0 - ошибок нет
 }

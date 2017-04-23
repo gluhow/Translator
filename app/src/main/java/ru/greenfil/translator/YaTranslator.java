@@ -17,18 +17,27 @@ import javax.net.ssl.HttpsURLConnection;
 
 class YaTranslator implements ITranslator {
     private final Integer some_error=1;
-    //private final Integer no_error=0;
-
+    private String key="trnsl.1.1.20170408T105508Z.9e4323ceef72527b.6578d71fe0273638aa0c3cd75b9d5a334115404f";
     private Integer fErrRes=some_error;
 
+    void SetKey(String key){
+        this.key=key;
+    }
 
     private String GetWebAnswer(String text, String sourceLang, String targetLang) {
+        /**
+         * Получить ответ от сервера Яндекса
+         * text - исходный текст
+         * sourceLang - исходный язык
+         * targetLang - целевой язык
+         */
         fErrRes=some_error;
         String yaURL="https://translate.yandex.net/api/v1.5/tr.json/translate ?";
         String params="";
         try {
             params = String.format(
-                    "key=trnsl.1.1.20170408T105508Z.9e4323ceef72527b.6578d71fe0273638aa0c3cd75b9d5a334115404f&text=%s&lang=%s-%s",
+                    "key=%s&text=%s&lang=%s-%s",
+                    key,
                     URLEncoder.encode(text, "UTF-8"),
                     sourceLang,
                     targetLang);
@@ -72,8 +81,9 @@ class YaTranslator implements ITranslator {
         return res;
     }
     private String GetTextFROMJSON(String text){
-        //return text;
-
+        /**
+         * Получить текст перевода по JSON-строке
+         */
         try {
             JSONObject resJSON = new JSONObject(text);
             JSONArray textAr = resJSON.getJSONArray("text");
@@ -92,6 +102,9 @@ class YaTranslator implements ITranslator {
 
     @Override
     public String Translate(String MyText, ILanguage SourceLanguage, ILanguage TargetLanguage) {
+        /**
+         * Перевести текст
+         */
         String WebAns = GetWebAnswer(MyText, SourceLanguage.GetUI(), TargetLanguage.GetUI());
         return GetTextFROMJSON(WebAns);
         //Перенести формирование кодов ошибки сюда!

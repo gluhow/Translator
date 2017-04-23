@@ -6,9 +6,11 @@ package ru.greenfil.translator;
 
 class TLanguage implements ILanguage {
     private String caption;
+    private String ui;
 
     @Override
     public boolean equals(Object o) {
+        //Сравнивается только идентификатор языка
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
@@ -23,7 +25,6 @@ class TLanguage implements ILanguage {
         return ui.hashCode();
     }
 
-    private String ui;
 
     TLanguage(String caption, String ui) {
         this.caption = caption;
