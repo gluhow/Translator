@@ -33,20 +33,23 @@ class tLangList extends ArrayList<ILanguage>{};
 
 public class MainActivity extends AppCompatActivity {
 
-    TextView textOut;
     ITranslator mytranslator;
-    EditText textIn;
-    Spinner SourceSpinner;
-    Spinner TargetSpinner;
+
+    Spinner sourceSpinner;
+    Button buttonSwap;
+    Spinner targetSpinner;
+    EditText sourceText;
+    TextView targetText;
+    FloatingActionButton favoritesButton;
+    BottomNavigationView navigation;
+    TextView copyright;
+    ListView wordListView;
+
     tLangList languageList;
     GetTranslate getTranslate = null;
-    Button buttonSwap;
     tWordList historyList;
     tWordList favoritList;
-    FloatingActionButton favoritesButton;
     DBHelper dbHelper;
-    BottomNavigationView navigation;
-    ListView wordListView;
     TOneWord fCurrentWord;
     public static final String APP_PREFERENCES = "translator.conf";
     public static final String APP_PREFERENCES_SOURCE_LANG = "sourceLang";
@@ -58,11 +61,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        textOut = (TextView) findViewById(R.id.outputText);
-        textOut.setText("");
-        textIn = (EditText) findViewById(R.id.InputText);
-        textIn.setText("Hello World!!!");
-        textIn.addTextChangedListener(new sourceTextChange());
+        targetText = (TextView) findViewById(R.id.outputText);
+        targetText.setText("");
+        sourceText = (EditText) findViewById(R.id.InputText);
+        sourceText.setText("Hello World!!!");
+        sourceText.addTextChangedListener(new sourceTextChange());
 
         languageList = new tLangList();
         LoadLangList(languageList);
@@ -78,17 +81,18 @@ public class MainActivity extends AppCompatActivity {
         String targetLangUI=mSettings.getString(APP_PREFERENCES_TARGET_LANG, "ru");
 
         OnLangChange langChange = new OnLangChange();
-        SourceSpinner = (Spinner) findViewById(R.id.SourceSpinner);
-        SourceSpinner.setAdapter(langAdapter);
-        SourceSpinner.setSelection(languageList.indexOf(new TLanguage("", sourceLangUI)));
-        SourceSpinner.setOnItemSelectedListener(langChange);
+        sourceSpinner = (Spinner) findViewById(R.id.SourceSpinner);
+        sourceSpinner.setAdapter(langAdapter);
+        sourceSpinner.setSelection(languageList.indexOf(new TLanguage("", sourceLangUI)));
+        sourceSpinner.setOnItemSelectedListener(langChange);
 
-        TargetSpinner = (Spinner) findViewById(R.id.TargetSpinner);
-        TargetSpinner.setAdapter(langAdapter);
-        TargetSpinner.setSelection(languageList.indexOf(new TLanguage("", targetLangUI)));
-        TargetSpinner.setOnItemSelectedListener(langChange);
+        targetSpinner = (Spinner) findViewById(R.id.TargetSpinner);
+        targetSpinner.setAdapter(langAdapter);
+        targetSpinner.setSelection(languageList.indexOf(new TLanguage("", targetLangUI)));
+        targetSpinner.setOnItemSelectedListener(langChange);
 
         favoritesButton = (FloatingActionButton) findViewById(R.id.favoritesButton);
+        copyright = (TextView) findViewById(R.id.copyright);
 
         historyList = new tWordList();
         favoritList = new tWordList();
@@ -116,9 +120,9 @@ public class MainActivity extends AppCompatActivity {
         super.onPause();
         SharedPreferences.Editor editor=mSettings.edit();
         editor.putString(APP_PREFERENCES_SOURCE_LANG,
-                ((ILanguage)SourceSpinner.getSelectedItem()).GetUI());
+                ((ILanguage) sourceSpinner.getSelectedItem()).GetUI());
         editor.putString(APP_PREFERENCES_TARGET_LANG,
-                ((ILanguage)TargetSpinner.getSelectedItem()).GetUI());
+                ((ILanguage) targetSpinner.getSelectedItem()).GetUI());
         editor.apply();
     }
 
@@ -129,20 +133,20 @@ public class MainActivity extends AppCompatActivity {
     void SetCurrentWord(TOneWord word){
         fCurrentWord=word;
         if (word!=null){
-            if (!word.getSourceText().equals(textIn.getText().toString().trim()))            {
-                textIn.setText(word.getSourceText());
+            if (!word.getSourceText().equals(sourceText.getText().toString().trim()))            {
+                sourceText.setText(word.getSourceText());
             }
-            if (!SourceSpinner.getSelectedItem().equals(word.getSourceLang())){
-                SourceSpinner.setSelection(languageList.indexOf(word.getSourceLang()));
+            if (!sourceSpinner.getSelectedItem().equals(word.getSourceLang())){
+                sourceSpinner.setSelection(languageList.indexOf(word.getSourceLang()));
             }
-            if (!TargetSpinner.getSelectedItem().equals(word.getTargetLang())){
-                TargetSpinner.setSelection(languageList.indexOf(word.getTargetLang()));
+            if (!targetSpinner.getSelectedItem().equals(word.getTargetLang())){
+                targetSpinner.setSelection(languageList.indexOf(word.getTargetLang()));
             }
-            textOut.setText(word.getTargetText());
+            targetText.setText(word.getTargetText());
             UpdateFavoritButton();
         }
         else {
-            textOut.setText("");
+            targetText.setText("");
         }
     }
 
@@ -200,12 +204,13 @@ public class MainActivity extends AppCompatActivity {
     void SetVisibleAll(int vis) {
         //Не надо сюда смотреть! Просто я не разобрался с фрагментами и передачей данных между ними
         //поэтому я тупо скрываю и показываю нужные элементы
-        textIn.setVisibility(vis);
-        textOut.setVisibility(vis);
-        SourceSpinner.setVisibility(vis);
-        TargetSpinner.setVisibility(vis);
+        sourceText.setVisibility(vis);
+        targetText.setVisibility(vis);
+        sourceSpinner.setVisibility(vis);
+        targetSpinner.setVisibility(vis);
         buttonSwap.setVisibility(vis);
         favoritesButton.setVisibility(vis);
+        copyright.setVisibility(vis);
 
         wordListView.setVisibility(-vis);
     }
@@ -249,14 +254,14 @@ public class MainActivity extends AppCompatActivity {
         protected void onPreExecute() {
             SetCurrentWord(null);
 
-            String text = textIn.getText().toString().trim();
+            String text = sourceText.getText().toString().trim();
             if (text.equals("")){
                 errCode=0;
                 CurrentWord=null;
                 return;
             }
-            ILanguage sourceLang = (ILanguage) SourceSpinner.getSelectedItem();
-            ILanguage targetLang = (ILanguage) TargetSpinner.getSelectedItem();
+            ILanguage sourceLang = (ILanguage) sourceSpinner.getSelectedItem();
+            ILanguage targetLang = (ILanguage) targetSpinner.getSelectedItem();
 
             CurrentWord = new TOneWord(sourceLang, targetLang, text);
 
@@ -303,7 +308,7 @@ public class MainActivity extends AppCompatActivity {
             }
             else
             {
-                textOut.setText(/*GetErrorCaption(errcode)*/ getString(R.string.someError));
+                targetText.setText(/*GetErrorCaption(errcode)*/ getString(R.string.someError));
             }
         }
     }
@@ -329,9 +334,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void OnSwapLanguage(View view) {
-        int tempLang = SourceSpinner.getSelectedItemPosition();
-        SourceSpinner.setSelection(TargetSpinner.getSelectedItemPosition());
-        TargetSpinner.setSelection(tempLang);
+        int tempLang = sourceSpinner.getSelectedItemPosition();
+        sourceSpinner.setSelection(targetSpinner.getSelectedItemPosition());
+        targetSpinner.setSelection(tempLang);
     }
 
     private class OnLangChange implements AdapterView.OnItemSelectedListener {
