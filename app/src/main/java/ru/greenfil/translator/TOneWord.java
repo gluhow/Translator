@@ -10,9 +10,9 @@ class TOneWord {
     private String sourceText;      //Исходный текст
     private String targetText;      //Целевой текст
 
+    /**Сравниваются только входные данные **/
     @Override
     public boolean equals(Object o) {
-        /**Сравниваются только входные данные **/
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
