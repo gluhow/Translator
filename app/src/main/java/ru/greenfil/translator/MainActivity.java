@@ -328,6 +328,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     void LoadData() {
+        final String recordLimit="1000";
         class tAsyncLoad extends AsyncTask<tLangList, Void, tWordList> {
             String tableName;
 
@@ -336,7 +337,11 @@ public class MainActivity extends AppCompatActivity {
                 tWordList historyList = new tWordList();
 
                 SQLiteDatabase database = dbHelper.getReadableDatabase();
-                Cursor cursor = database.query(tableName, null, null, null, null, null, null);
+                Cursor cursor =
+                        database.query(tableName,
+                                null, null, null, null, null,
+                                dbHelper.KEY_ID+ " DESC",
+                                recordLimit);
 
                 if (cursor.moveToFirst()) {
                     int slIndex = cursor.getColumnIndex(DBHelper.KEY_SOURCE_LANG);
