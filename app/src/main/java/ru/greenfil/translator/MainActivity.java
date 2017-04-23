@@ -33,42 +33,45 @@ class tLangList extends ArrayList<ILanguage>{};
 
 public class MainActivity extends AppCompatActivity {
 
-    ITranslator mytranslator;
+    ITranslator mytranslator; //Текущий объект-переводчик
 
-    Spinner sourceSpinner;
-    Button buttonSwap;
-    Spinner targetSpinner;
-    EditText sourceText;
-    TextView targetText;
-    FloatingActionButton favoritesButton;
-    BottomNavigationView navigation;
-    TextView copyright;
-    ListView wordListView;
+    Spinner sourceSpinner; //Spinner исходного языка
+    Button buttonSwap;     //Кнопка "поменять языки местами"
+    Spinner targetSpinner;  //Spinner целевого языка
+    EditText sourceText;    //Исходный текст
+    TextView targetText;    //Целевой текст
+    FloatingActionButton favoritesButton; //Кнопка "добавить в Избранное"
+    BottomNavigationView navigation; //Панель навигации снизу
+    TextView copyright;     //Копирайт яндекса
+    ListView wordListView;  //Список для просмотра истории/избранного
 
-    tLangList languageList;
-    GetTranslate getTranslate = null;
-    tWordList historyList;
-    tWordList favoritList;
-    DBHelper dbHelper;
-    TOneWord fCurrentWord;
-    public static final String APP_PREFERENCES = "translator.conf";
-    public static final String APP_PREFERENCES_SOURCE_LANG = "sourceLang";
-    public static final String APP_PREFERENCES_TARGET_LANG = "targetLang";
-    private SharedPreferences mSettings;
+    tLangList languageList; //Список языков, доступных для перевода
+    GetTranslate getTranslate = null; //Объект занимающийся перевод в фоне
+    tWordList historyList;  //список переводов
+    tWordList favoritList;  //список избранного
+    DBHelper dbHelper;  //хелпер для работы с ДБ
+    TOneWord fCurrentWord;  //Текущее слово
+
+    public static final String APP_PREFERENCES = "translator.conf"; //имя конфигурационного файла
+    public static final String APP_PREFERENCES_SOURCE_LANG = "sourceLang"; //поле исходного языка
+    public static final String APP_PREFERENCES_TARGET_LANG = "targetLang";// поле целевого языка
+    private SharedPreferences mSettings; //настройки
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        //**Инициализация переменных и загрузка данных
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         targetText = (TextView) findViewById(R.id.outputText);
         targetText.setText("");
         sourceText = (EditText) findViewById(R.id.InputText);
-        sourceText.setText("Hello World!!!");
+        sourceText.setText("");
         sourceText.addTextChangedListener(new sourceTextChange());
 
         languageList = new tLangList();
-        LoadLangList(languageList);
+        languageList=LoadLangList();
         buttonSwap = (Button) findViewById(R.id.buttonSwap);
 
         mytranslator = new YaTranslator();
@@ -106,17 +109,21 @@ public class MainActivity extends AppCompatActivity {
         LoadData();
     }
 
-    void LoadLangList(tLangList langList) {
+    tLangList LoadLangList() {
+        //**Загрузка списка языков
+        tLangList langList=new tLangList();
         String[] langUI=getResources().getStringArray(R.array.LangUI);
         String[] langCaption=getResources().getStringArray(R.array.LangCaption);
         int ArrLength=Math.min(langUI.length, langCaption.length);
         for (int iLang=0; iLang<ArrLength; iLang++){
             langList.add(new TLanguage(langCaption[iLang], langUI[iLang]));
         }
+        return langList;
     }
 
     @Override
     protected void onPause() {
+        //**Сохранение настроек
         super.onPause();
         SharedPreferences.Editor editor=mSettings.edit();
         editor.putString(APP_PREFERENCES_SOURCE_LANG,
@@ -127,10 +134,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     TOneWord GetCurrentWord() {
+        //Текущее переведенное слово
         return fCurrentWord;
     }
 
     void SetCurrentWord(TOneWord word){
+        //**Задать переведенное слово
         fCurrentWord=word;
         if (word!=null){
             if (!word.getSourceText().equals(sourceText.getText().toString().trim()))            {
@@ -143,21 +152,22 @@ public class MainActivity extends AppCompatActivity {
                 targetSpinner.setSelection(languageList.indexOf(word.getTargetLang()));
             }
             targetText.setText(word.getTargetText());
-            UpdateFavoritButton();
+            UpdateFavoritButton(word);
         }
         else {
             targetText.setText("");
         }
     }
 
-    void UpdateFavoritButton() {
-        TOneWord CurrentWord = GetCurrentWord();
+    void UpdateFavoritButton(TOneWord CurrentWord) {
+        //Обновить отображение кнопки "Избранное" в соответствии с заданым словом
         if (favoritList.contains(CurrentWord)) {
             favoritesButton.setImageResource(R.drawable.favorite);
         } else favoritesButton.setImageResource(R.drawable.nonfavorite);
     }
 
     public void addFavorites(View view) {
+        //**Добавляет/удаляет слово из списка избранного
         TOneWord CurrentWord = GetCurrentWord();
         if (CurrentWord!=null)
         {
@@ -166,11 +176,12 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 SaveToFavorite(CurrentWord);
             }
-            UpdateFavoritButton();
+            UpdateFavoritButton(CurrentWord);
         }
     }
 
     private void SaveToFavorite(TOneWord currentWord) {
+        //**Сохраняет избранное слово в БД
         if (!favoritList.contains(currentWord)) {
             favoritList.add(currentWord);
             SQLiteDatabase database = dbHelper.getWritableDatabase();
@@ -186,6 +197,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void RemoveFromFavorite(TOneWord currentWord) {
+        //**Удаляет избранное слово из БД
         if (favoritList.contains(currentWord)) {
             favoritList.remove(currentWord);
             SQLiteDatabase database = dbHelper.getWritableDatabase();
@@ -223,8 +235,8 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {
+            //**Перевод текста по изменению исходного текста
             translateNow();
-            UpdateFavoritButton();
         }
 
         @Override
@@ -234,6 +246,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void translateNow() {
+        //**Инициализирует перевод текста
         if (getTranslate != null) {
             getTranslate.cancel(true);
         }
@@ -244,14 +257,16 @@ public class MainActivity extends AppCompatActivity {
 
     private class GetTranslate
             extends AsyncTask<ITranslator, Void, TOneWord> {
+        //**Класс для фонового перевода текста
 
-        TOneWord CurrentWord;
-        final int some_error = 1;
-        int errCode = some_error;
+        TOneWord CurrentWord; //Текущее слово перевода
+        final int some_error = 1; //Микро набор кодов ошибок
+        int errCode = some_error; //Текущее состояние 0-ошибок нет
 
 
         @Override
         protected void onPreExecute() {
+            //**Получаем текущее задание и провермяем слово в списках уже переведенных
             SetCurrentWord(null);
 
             String text = sourceText.getText().toString().trim();
@@ -281,7 +296,9 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected TOneWord doInBackground(ITranslator... params) {
+            //Сам перевод
             if (errCode!=0) {
+                //Перевод ненайденного
                 try {
                     Thread.sleep(1000); //Задержка перед переводом для сохранения траффика
                 } catch (InterruptedException e) {
@@ -301,6 +318,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(TOneWord word) {
+            //Выдаём результат или сообщаем об ошибке
             if (errCode==0)
             {
                 SetCurrentWord(word);
@@ -314,6 +332,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void saveToHistory(TOneWord currentWord) {
+        //Сохранение слова в БД истории
         if (currentWord==null) return;
         if (!historyList.contains(currentWord)) {
             SQLiteDatabase database = dbHelper.getWritableDatabase();
@@ -334,6 +353,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void OnSwapLanguage(View view) {
+        //Поменять местами языки
         int tempLang = sourceSpinner.getSelectedItemPosition();
         sourceSpinner.setSelection(targetSpinner.getSelectedItemPosition());
         targetSpinner.setSelection(tempLang);
@@ -343,6 +363,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+            //Инициализируем перевод при смене языка
             translateNow();
         }
 
@@ -355,18 +376,24 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            //При щелчке по слову истории/избранного переходим на основной экран
+            // и отображаем это слово
             SetCurrentWord((TOneWord)parent.getItemAtPosition(position));
             navigation.setSelectedItemId(R.id.action_home);
         }
     }
 
     void LoadData() {
+        //Фоновая загрузка данных из БД
         final String recordLimit="1000";
         class tAsyncLoad extends AsyncTask<tLangList, Void, tWordList> {
+            //**Класс для фоновой загрузки данных из БД
             String tableName;
 
             @Override
             protected tWordList doInBackground(tLangList... params) {
+                //**Загрузка данныз из таблицы tableName
+                // которая определена в потомке
                 tWordList historyList = new tWordList();
 
                 SQLiteDatabase database = dbHelper.getReadableDatabase();
@@ -406,6 +433,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         class tAsyncHistoryLoad extends tAsyncLoad {
+            //**Загрузка из таблицы истории
             @Override
             protected void onPreExecute() {
                 tableName = dbHelper.TABLE_HISTORY;
@@ -417,6 +445,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         class tAsyncFavoriteLoad extends tAsyncLoad {
+            //**Загрузка из таблицы избранного
             @Override
             protected void onPreExecute() {
                 tableName = dbHelper.TABLE_FAVORITES;
@@ -437,12 +466,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     tOneWordAdapter GetAdapter(@NonNull List<TOneWord> list){
+        //Создание адаптера для просмотра списка истории/избранного
         return (new tOneWordAdapter(this, R.layout.word_item, list, favoritList));
     }
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
-
+        //**Переключение "страниц"
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()) {
