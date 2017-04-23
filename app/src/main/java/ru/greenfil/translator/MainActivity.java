@@ -22,6 +22,9 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 class tWordList extends ArrayList<TOneWord>{};
@@ -414,6 +417,12 @@ public class MainActivity extends AppCompatActivity {
                     return true;
                 case R.id.action_favorites:
                     SetVisibleAll(-1);
+                    Collections.sort(favoritList, new Comparator<TOneWord>() {
+                        @Override
+                        public int compare(TOneWord o1, TOneWord o2) {
+                            return o1.toString().toUpperCase().compareTo(o2.toString().toUpperCase());
+                        }
+                    });
                     wordListView.setAdapter(GetAdapter(favoritList));
                     return true;
             }
