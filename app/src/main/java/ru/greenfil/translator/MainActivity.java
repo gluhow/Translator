@@ -1,6 +1,8 @@
 package ru.greenfil.translator;
 
 import android.content.ContentValues;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
@@ -22,7 +24,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -47,6 +48,11 @@ public class MainActivity extends AppCompatActivity {
     BottomNavigationView navigation;
     ListView wordListView;
     TOneWord fCurrentWord;
+    public static final String APP_PREFERENCES = "translator.conf";
+    public static final String APP_PREFERENCES_SOURCE_LANG = "sourceLang";
+    public static final String APP_PREFERENCES_TARGET_LANG = "targetLang";
+    private SharedPreferences mSettings;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,8 +65,7 @@ public class MainActivity extends AppCompatActivity {
         textIn.addTextChangedListener(new sourceTextChange());
 
         languageList = new tLangList();
-        languageList.add(new TLanguage("English", "en"));
-        languageList.add(new TLanguage("Русский", "ru"));
+        LoadLangList(languageList);
         buttonSwap = (Button) findViewById(R.id.buttonSwap);
 
         mytranslator = new YaTranslator();
@@ -68,14 +73,19 @@ public class MainActivity extends AppCompatActivity {
                 languageList);
         langAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
+        mSettings = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
+        String sourceLangUI=mSettings.getString(APP_PREFERENCES_SOURCE_LANG, "en");
+        String targetLangUI=mSettings.getString(APP_PREFERENCES_TARGET_LANG, "ru");
+
         OnLangChange langChange = new OnLangChange();
         SourceSpinner = (Spinner) findViewById(R.id.SourceSpinner);
         SourceSpinner.setAdapter(langAdapter);
+        SourceSpinner.setSelection(languageList.indexOf(new TLanguage("", sourceLangUI)));
         SourceSpinner.setOnItemSelectedListener(langChange);
 
         TargetSpinner = (Spinner) findViewById(R.id.TargetSpinner);
         TargetSpinner.setAdapter(langAdapter);
-        TargetSpinner.setSelection(1);
+        TargetSpinner.setSelection(languageList.indexOf(new TLanguage("", targetLangUI)));
         TargetSpinner.setOnItemSelectedListener(langChange);
 
         favoritesButton = (FloatingActionButton) findViewById(R.id.favoritesButton);
@@ -88,9 +98,28 @@ public class MainActivity extends AppCompatActivity {
         navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
         wordListView = (ListView) findViewById(R.id.wordListView);
-        //wordListView.setOnItemSelectedListener(new wordListener());]
         wordListView.setOnItemClickListener(new wordListener());
         LoadData();
+    }
+
+    void LoadLangList(tLangList langList) {
+        String[] langUI=getResources().getStringArray(R.array.LangUI);
+        String[] langCaption=getResources().getStringArray(R.array.LangCaption);
+        int ArrLength=Math.min(langUI.length, langCaption.length);
+        for (int iLang=0; iLang<ArrLength; iLang++){
+            langList.add(new TLanguage(langCaption[iLang], langUI[iLang]));
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        SharedPreferences.Editor editor=mSettings.edit();
+        editor.putString(APP_PREFERENCES_SOURCE_LANG,
+                ((ILanguage)SourceSpinner.getSelectedItem()).GetUI());
+        editor.putString(APP_PREFERENCES_TARGET_LANG,
+                ((ILanguage)TargetSpinner.getSelectedItem()).GetUI());
+        editor.apply();
     }
 
     TOneWord GetCurrentWord() {
