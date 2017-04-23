@@ -36,7 +36,6 @@ public class MainActivity extends AppCompatActivity {
     ITranslator mytranslator;
     EditText textIn;
     Spinner SourceSpinner;
-    ArrayAdapter<ILanguage> langAdapter;
     Spinner TargetSpinner;
     tLangList languageList;
     GetTranslate getTranslate = null;
@@ -65,9 +64,9 @@ public class MainActivity extends AppCompatActivity {
         buttonSwap = (Button) findViewById(R.id.buttonSwap);
 
         mytranslator = new YaTranslator();
-        langAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item,
+        ArrayAdapter<ILanguage> langAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item,
                 languageList);
-        langAdapter.setDropDownViewResource(android.R.layout.simple_spinner_item);
+        langAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
         OnLangChange langChange = new OnLangChange();
         SourceSpinner = (Spinner) findViewById(R.id.SourceSpinner);
