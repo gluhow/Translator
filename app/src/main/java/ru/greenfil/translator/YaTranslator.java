@@ -1,5 +1,7 @@
 package ru.greenfil.translator;
 
+import android.support.annotation.NonNull;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -102,10 +104,17 @@ class YaTranslator implements ITranslator {
      * Перевести текст
      */
     @Override
-    public String Translate(String MyText, String SourceLanguageUI, String TargetLanguageUI) {
-        String WebAns = GetWebAnswer(MyText, SourceLanguageUI, TargetLanguageUI);
-        return GetTextFROMJSON(WebAns);
-        //Перенести формирование кодов ошибки сюда!
+    public String Translate(@NonNull String MyText,@NonNull String SourceLanguageUI,@NonNull String TargetLanguageUI) {
+        if (!MyText.isEmpty()) {
+            String WebAns = GetWebAnswer(MyText, SourceLanguageUI, TargetLanguageUI);
+            return GetTextFROMJSON(WebAns);
+            //Перенести формирование кодов ошибки сюда!
+        }
+        else
+        {
+            fErrRes=0;
+            return "";
+        }
     }
 
     @Override
